@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sement_market_customer/features/auth/presentation/bloc/auth_bloc.dart';
 
 class LoginPage extends StatelessWidget {
@@ -10,9 +11,12 @@ class LoginPage extends StatelessWidget {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthAuthenticated) {}
+          if (state is AuthAuthenticated) {
+            context.go('/notifications');
+          }
           if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(state.message)));
           }
         },
         builder: (context, state) {
@@ -47,7 +51,8 @@ class _PhoneViewState extends State<_PhoneView> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text('Telefon raqamingizni kiriting', style: TextStyle(fontSize: 18)),
+          const Text('Telefon raqamingizni kiriting',
+              style: TextStyle(fontSize: 18)),
           const SizedBox(height: 16),
           TextField(
             controller: _controller,
@@ -57,7 +62,9 @@ class _PhoneViewState extends State<_PhoneView> {
           const SizedBox(height: 24),
           FilledButton(
             onPressed: () {
-              context.read<AuthBloc>().add(AuthSendCode(_controller.text.trim()));
+              context
+                  .read<AuthBloc>()
+                  .add(AuthSendCode(_controller.text.trim()));
             },
             child: const Text('Kod yuborish'),
           ),
@@ -93,7 +100,8 @@ class _VerifyCodeViewState extends State<_VerifyCodeView> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('${widget.phone} ga yuborilgan kodni kiriting', style: const TextStyle(fontSize: 16)),
+          Text('${widget.phone} ga yuborilgan kodni kiriting',
+              style: const TextStyle(fontSize: 16)),
           const SizedBox(height: 16),
           TextField(
             controller: _codeController,
@@ -111,7 +119,9 @@ class _VerifyCodeViewState extends State<_VerifyCodeView> {
               context.read<AuthBloc>().add(AuthVerify(
                     phone: widget.phone,
                     code: _codeController.text.trim(),
-                    name: _nameController.text.trim().isEmpty ? null : _nameController.text.trim(),
+                    name: _nameController.text.trim().isEmpty
+                        ? null
+                        : _nameController.text.trim(),
                   ));
             },
             child: const Text('Tasdiqlash'),

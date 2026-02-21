@@ -9,7 +9,10 @@ class ApiClient {
       baseUrl: baseUrl,
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
-      headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
     ));
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
@@ -38,7 +41,7 @@ class ApiClient {
   late final Dio _dio;
   Dio get dio => _dio;
 
-  static const _defaultBaseUrl = 'https://api.sementmarket.uz/api/v1';
+  static const _defaultBaseUrl = 'http://10.143.192.70:8000/api/v1';
 
   static ApiClient create([String? baseUrl]) {
     return ApiClient(baseUrl: baseUrl ?? _defaultBaseUrl);
