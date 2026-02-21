@@ -25,7 +25,13 @@ abstract class AppRouter {
           return null;
         },
         routes: [
-          GoRoute(path: '/login', builder: (_, __) => const LoginPage()),
+          GoRoute(
+            path: '/login',
+            builder: (_, __) => BlocProvider(
+              create: (_) => AuthBloc(),
+              child: const LoginPage(),
+            ),
+          ),
           GoRoute(
               path: '/profile-setup',
               builder: (_, __) => const ProfileSetupPage()),
