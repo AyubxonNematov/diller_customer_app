@@ -1,0 +1,38 @@
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class ApiClient {
+  ApiClient({required String baseUrl}) {
+    _dio = Dio(BaseOptions(
+      baseUrl: baseUrl,
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
+      headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+    ));
+    _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('auth_token');
+        if (token != null) {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
+        return handler.next(options);
+      },
+      onError: (e, handler) {
+        if (e.response?.statusCode == 401) {
+          // Clear token and go to login
+        }
+        return handler.next(e);
+      },
+    ));
+  }
+
+  late final Dio _dio;
+  Dio get dio => _dio;
+
+  static const _defaultBaseUrl = 'https://api.sementmarket.uz/api/v1';
+
+  static ApiClient create([String? baseUrl]) {
+    return ApiClient(baseUrl: baseUrl ?? _defaultBaseUrl);
+  }
+}
