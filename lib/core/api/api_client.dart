@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:sement_market_customer/core/debug/alice_setup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiClient {
@@ -25,6 +27,12 @@ class ApiClient {
         return handler.next(e);
       },
     ));
+    if (kDebugMode) {
+      final aliceInterceptor = aliceDioInterceptor;
+      if (aliceInterceptor != null) {
+        _dio.interceptors.add(aliceInterceptor);
+      }
+    }
   }
 
   late final Dio _dio;
