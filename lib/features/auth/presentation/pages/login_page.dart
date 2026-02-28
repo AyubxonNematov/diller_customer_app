@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthAuthenticated) {
-            context.go('/notifications');
+            context.go('/profile');
           }
           if (state is AuthError) {
             ScaffoldMessenger.of(context)
@@ -223,7 +223,7 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
               onPressed: _hasInput
                   ? () {
                       final phone =
-                          '+998${_controller.text.replaceAll(' ', '')}';
+                          '998${_controller.text.replaceAll(' ', '')}';
                       context.read<AuthBloc>().add(AuthSendCode(phone));
                     }
                   : null,
