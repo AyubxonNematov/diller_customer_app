@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sement_market_customer/core/debug/alice_setup.dart';
+import 'package:sement_market_customer/core/firebase/firebase_notifications.dart';
 import 'package:sement_market_customer/core/theme/app_theme.dart';
 import 'package:sement_market_customer/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sement_market_customer/features/auth/presentation/pages/login_page.dart';
@@ -36,8 +37,10 @@ abstract class AppRouter {
             ),
           ),
           ShellRoute(
-            builder: (context, state, child) =>
-                _MainShell(location: state.matchedLocation, child: child),
+            builder: (context, state, child) => _MainShell(
+              location: state.matchedLocation,
+              child: _FcmSyncWrapper(child: child),
+            ),
             routes: [
               GoRoute(
                 path: '/diller',
@@ -63,6 +66,27 @@ abstract class AppRouter {
           ),
         ],
       );
+}
+
+class _FcmSyncWrapper extends StatefulWidget {
+  const _FcmSyncWrapper({required this.child});
+  final Widget child;
+
+  @override
+  State<_FcmSyncWrapper> createState() => _FcmSyncWrapperState();
+}
+
+class _FcmSyncWrapperState extends State<_FcmSyncWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FirebaseNotificationsService.sendFcmTokenIfAuthenticated();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 class _MainShell extends StatelessWidget {

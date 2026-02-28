@@ -1,4 +1,4 @@
-package com.example.sement_market_customer
+package com.girhub.dillermarket
 
 import io.flutter.embedding.android.FlutterActivity
 
