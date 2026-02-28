@@ -58,75 +58,10 @@ class _LogoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            color: AppColors.gold,
-            borderRadius: BorderRadius.circular(size * 0.25),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.gold.withValues(alpha: 0.3),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: const SizedBox.shrink(),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Text(
-              'DILLER',
-              style: TextStyle(
-                fontSize: size * 0.28,
-                fontWeight: FontWeight.w900,
-                color: onDark ? Colors.white : AppColors.darkNavy,
-                letterSpacing: 0.5,
-                height: 1,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 2),
-              child: Container(
-                width: size * 0.07,
-                height: size * 0.07,
-                decoration: const BoxDecoration(
-                  color: AppColors.gold,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-            Text(
-              'MARKET',
-              style: TextStyle(
-                fontSize: size * 0.28,
-                fontWeight: FontWeight.w900,
-                color: onDark ? Colors.white : AppColors.darkNavy,
-                letterSpacing: 0.5,
-                height: 1,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'PROFESSIONAL HARIDOR PLATFORMASI',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-            color: onDark ? Colors.white54 : AppColors.grayText,
-            letterSpacing: 1.5,
-          ),
-        ),
-      ],
+    return Image.asset(
+      'assets/diller_logo.png',
+      width: size * 2.2,
+      fit: BoxFit.contain,
     );
   }
 }
