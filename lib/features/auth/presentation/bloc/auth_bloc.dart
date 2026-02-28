@@ -18,10 +18,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final api = getIt<ApiClient>();
-      await api.dio.post('/auth/send-code', data: {'phone': event.phone});
-      emit(AuthCodeSent(phone: event.phone));
+      final phone = event.phone.replaceAll(RegExp(r'\D'), '');
+      await api.dio.post('/auth/send-code', data: {'phone': phone});
+      emit(AuthCodeSent(phone: phone));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      emit(AuthError(_parseError(e)));
     }
   }
 
@@ -29,21 +30,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final api = getIt<ApiClient>();
+      final phone = event.phone.replaceAll(RegExp(r'\D'), '');
       final r = await api.dio.post('/auth/verify', data: {
-        'phone': event.phone,
+        'phone': phone,
         'code': event.code,
-        if (event.name != null) 'name': event.name,
       });
       final token = r.data['token'] as String?;
       if (token == null) {
-        emit(AuthError('Token olindi emas'));
+        emit(AuthError('Token olinmadi'));
         return;
       }
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('auth_token', token);
-      emit(AuthAuthenticated(user: r.data['user']));
+      final customer = r.data['customer'] as Map<String, dynamic>?;
+      emit(AuthAuthenticated(
+        token: token,
+        customer: customer ?? {},
+      ));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      emit(AuthError(_parseError(e)));
     }
   }
 
@@ -51,5 +56,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
     emit(AuthInitial());
+  }
+
+  String _parseError(dynamic e) {
+    if (e is Exception) {
+      final str = e.toString();
+      if (str.contains('message')) return str;
+    }
+    return e.toString();
   }
 }

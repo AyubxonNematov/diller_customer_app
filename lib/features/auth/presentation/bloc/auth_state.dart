@@ -15,8 +15,9 @@ final class AuthCodeSent extends AuthState {
 }
 
 final class AuthAuthenticated extends AuthState {
-  AuthAuthenticated({required this.user});
-  final dynamic user;
+  AuthAuthenticated({required this.token, required this.customer});
+  final String token;
+  final Map<String, dynamic> customer;
 }
 
 final class AuthError extends AuthState {
