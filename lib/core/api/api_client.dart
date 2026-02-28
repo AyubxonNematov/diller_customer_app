@@ -41,7 +41,7 @@ class ApiClient {
   late final Dio _dio;
   Dio get dio => _dio;
 
-  static const _defaultBaseUrl = 'http://127.0.0.1:8000/api/customers/v1';
+  static const _defaultBaseUrl = 'http://10.13.81.70:8000/customers/v1';
 
   static ApiClient create([String? baseUrl]) {
     return ApiClient(baseUrl: baseUrl ?? _defaultBaseUrl);

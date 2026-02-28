@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sement_market_customer/core/debug/alice_setup.dart';
-import 'package:sement_market_customer/core/permissions/permission_page.dart';
 import 'package:sement_market_customer/core/theme/app_theme.dart';
 import 'package:sement_market_customer/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sement_market_customer/features/auth/presentation/pages/login_page.dart';
@@ -17,22 +17,17 @@ abstract class AppRouter {
 
   static GoRouter get router => GoRouter(
         navigatorKey: navigatorKey,
-        initialLocation: '/permissions',
+        initialLocation: '/login',
         redirect: (context, state) async {
           final loc = state.matchedLocation;
-          if (loc == '/permissions') return null;
           final prefs = await SharedPreferences.getInstance();
           final token = prefs.getString('auth_token');
           final isLoginRoute = loc == '/login';
-          if (token != null && isLoginRoute) return '/profile';
+          if (token != null && isLoginRoute) return '/diller';
           if (token == null && !isLoginRoute) return '/login';
           return null;
         },
         routes: [
-          GoRoute(
-            path: '/permissions',
-            builder: (_, __) => const PermissionPage(),
-          ),
           GoRoute(
             path: '/login',
             builder: (_, __) => BlocProvider(
@@ -46,7 +41,7 @@ abstract class AppRouter {
             routes: [
               GoRoute(
                 path: '/diller',
-                builder: (_, __) => const _PlaceholderPage(title: 'Diller'),
+                builder: (_, __) => const _DillerPage(),
               ),
               GoRoute(
                 path: '/zakazlar',
@@ -148,8 +143,139 @@ class _PlaceholderPage extends StatelessWidget {
       backgroundColor: Colors.grey[100],
       body: Center(
         child: Text(title,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800,
+            style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
                 color: AppColors.darkNavy)),
+      ),
+    );
+  }
+}
+
+class _DillerPage extends StatefulWidget {
+  const _DillerPage();
+
+  @override
+  State<_DillerPage> createState() => _DillerPageState();
+}
+
+class _DillerPageState extends State<_DillerPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkLocation());
+  }
+
+  Future<void> _checkLocation() async {
+    if (!mounted) return;
+    final status = await Geolocator.checkPermission();
+    if (!mounted) return;
+    if (status == LocationPermission.denied ||
+        status == LocationPermission.unableToDetermine) {
+      _showLocationDialog(deniedForever: false);
+    } else if (status == LocationPermission.deniedForever) {
+      _showLocationDialog(deniedForever: true);
+    }
+  }
+
+  void _showLocationDialog({required bool deniedForever}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 16),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF4C400).withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.location_on,
+                color: Color(0xFFF4C400),
+                size: 32,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Joylashuvga ruxsat',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF0E1A33),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Yaqin dillerlarni topish uchun joylashuvingizga ruxsat bering',
+              style: TextStyle(
+                fontSize: 13,
+                color: Color(0xFF9EA6B3),
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF0E1A33),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                onPressed: () async {
+                  Navigator.of(ctx).pop();
+                  if (deniedForever) {
+                    await Geolocator.openAppSettings();
+                  } else {
+                    await Geolocator.requestPermission();
+                  }
+                },
+                child: Text(
+                  deniedForever ? 'Sozlamalarga o\'tish' : 'Ruxsat berish',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text(
+                'Keyinroq',
+                style: TextStyle(color: Color(0xFF9EA6B3)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      body: const Center(
+        child: Text(
+          'DILLER',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            color: AppColors.darkNavy,
+          ),
+        ),
       ),
     );
   }

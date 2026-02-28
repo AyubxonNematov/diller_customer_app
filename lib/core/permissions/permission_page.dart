@@ -18,58 +18,81 @@ class _PermissionPageState extends State<PermissionPage> {
   @override
   void initState() {
     super.initState();
-    _checkAll();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkAll());
   }
 
   Future<void> _checkAll() async {
+    if (!mounted) return;
     setState(() => _loading = true);
-    await Future.wait([_checkNotification(), _checkLocation()]);
+    try {
+      await Future.wait([_checkNotification(), _checkLocation()]);
+    } catch (_) {}
+    if (!mounted) return;
     setState(() => _loading = false);
     _proceedIfReady();
   }
 
   Future<void> _checkNotification() async {
-    final settings = await FirebaseMessaging.instance.getNotificationSettings();
-    final granted = settings.authorizationStatus == AuthorizationStatus.authorized ||
-        settings.authorizationStatus == AuthorizationStatus.provisional;
-    setState(() => _notifGranted = granted);
+    try {
+      final settings = await FirebaseMessaging.instance.getNotificationSettings();
+      final granted =
+          settings.authorizationStatus == AuthorizationStatus.authorized ||
+              settings.authorizationStatus == AuthorizationStatus.provisional;
+      if (mounted) setState(() => _notifGranted = granted);
+    } catch (_) {}
   }
 
   Future<void> _checkLocation() async {
-    final status = await Geolocator.checkPermission();
-    setState(() => _locationGranted =
-        status == LocationPermission.always || status == LocationPermission.whileInUse);
+    try {
+      final status = await Geolocator.checkPermission();
+      if (mounted) {
+        setState(() => _locationGranted =
+            status == LocationPermission.always ||
+                status == LocationPermission.whileInUse);
+      }
+    } catch (_) {}
   }
 
   void _proceedIfReady() {
+    if (!mounted) return;
     if (_notifGranted && _locationGranted) {
-      context.go('/login');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) context.go('/login');
+      });
     }
   }
 
   Future<void> _requestNotification() async {
-    final settings = await FirebaseMessaging.instance.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-    final granted = settings.authorizationStatus == AuthorizationStatus.authorized ||
-        settings.authorizationStatus == AuthorizationStatus.provisional;
-    setState(() => _notifGranted = granted);
+    try {
+      final settings = await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      final granted =
+          settings.authorizationStatus == AuthorizationStatus.authorized ||
+              settings.authorizationStatus == AuthorizationStatus.provisional;
+      if (mounted) setState(() => _notifGranted = granted);
+    } catch (_) {}
     _proceedIfReady();
   }
 
   Future<void> _requestLocation() async {
-    var status = await Geolocator.checkPermission();
-    if (status == LocationPermission.deniedForever) {
-      await Geolocator.openAppSettings();
-      await _checkLocation();
-      _proceedIfReady();
-      return;
-    }
-    status = await Geolocator.requestPermission();
-    setState(() => _locationGranted =
-        status == LocationPermission.always || status == LocationPermission.whileInUse);
+    try {
+      var status = await Geolocator.checkPermission();
+      if (status == LocationPermission.deniedForever) {
+        await Geolocator.openAppSettings();
+        await _checkLocation();
+        _proceedIfReady();
+        return;
+      }
+      status = await Geolocator.requestPermission();
+      if (mounted) {
+        setState(() => _locationGranted =
+            status == LocationPermission.always ||
+                status == LocationPermission.whileInUse);
+      }
+    } catch (_) {}
     _proceedIfReady();
   }
 
