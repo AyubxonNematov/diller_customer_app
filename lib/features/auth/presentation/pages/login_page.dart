@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sement_market_customer/core/theme/app_theme.dart';
 import 'package:sement_market_customer/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:smart_auth/smart_auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -285,17 +286,82 @@ class _OtpVerifyView extends StatefulWidget {
 }
 
 class _OtpVerifyViewState extends State<_OtpVerifyView> {
+  final _smartAuth = SmartAuth.instance;
   final List<TextEditingController> _controllers =
       List.generate(4, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
 
-  bool get _allFilled =>
-      _controllers.every((c) => c.text.length == 1);
-
+  bool get _allFilled => _controllers.every((c) => c.text.length == 1);
   String get _code => _controllers.map((c) => c.text).join();
 
   @override
+  void initState() {
+    super.initState();
+    _setupFocusNodes();
+    for (final c in _controllers) {
+      c.addListener(() => setState(() {}));
+    }
+    _listenForSms();
+  }
+
+  void _setupFocusNodes() {
+    for (int i = 0; i < 4; i++) {
+      final index = i;
+      _focusNodes[index].onKeyEvent = (node, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.backspace &&
+            _controllers[index].text.isEmpty &&
+            index > 0) {
+          _controllers[index - 1].clear();
+          _focusNodes[index - 1].requestFocus();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      };
+    }
+  }
+
+  Future<void> _listenForSms() async {
+    final res = await _smartAuth.getSmsWithUserConsentApi();
+    if (!mounted) return;
+    if (res.hasData && res.requireData.code != null) {
+      _fillCode(res.requireData.code!);
+    }
+  }
+
+  void _fillCode(String raw) {
+    final digits = raw.replaceAll(RegExp(r'\D'), '');
+    if (digits.length < 4) return;
+    for (int i = 0; i < 4; i++) {
+      _controllers[i].text = digits[i];
+    }
+    setState(() {});
+    if (_allFilled && mounted) {
+      context.read<AuthBloc>().add(AuthVerify(
+            phone: widget.phone,
+            code: _code,
+          ));
+    }
+  }
+
+  void _clearAll() {
+    for (final c in _controllers) {
+      c.clear();
+    }
+    _focusNodes[0].requestFocus();
+    setState(() {});
+  }
+
+  void _onBoxChanged(int index, String value) {
+    if (value.isNotEmpty && index < 3) {
+      _focusNodes[index + 1].requestFocus();
+    }
+    setState(() {});
+  }
+
+  @override
   void dispose() {
+    _smartAuth.removeUserConsentApiListener();
     for (final c in _controllers) {
       c.dispose();
     }
@@ -305,143 +371,143 @@ class _OtpVerifyViewState extends State<_OtpVerifyView> {
     super.dispose();
   }
 
-  void _onChanged(int index, String value) {
-    if (value.isNotEmpty && index < 3) {
-      _focusNodes[index + 1].requestFocus();
-    }
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.darkNavy,
-      body: SafeArea(
-        bottom: false,
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           children: [
-            const SizedBox(height: 32),
-            const _LogoWidget(size: 70, onDark: true),
-            const SizedBox(height: 28),
-            const Text(
-              'Tasdiqlash',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
+            const Spacer(flex: 2),
+            const _LogoWidget(size: 80),
+            const Spacer(),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Tasdiqlash',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.darkNavy,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '+${widget.phone} RAQAMIGA KOD YUBORILDI',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.grayText,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              '${widget.phone} RAQAMIGA KOD YUBORILDI',
-              style: const TextStyle(
-                fontSize: 11,
-                color: Colors.white70,
-                letterSpacing: 1,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 32),
-            Expanded(
-              child: Container(
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 40),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: AppColors.gold,
-                            width: 2,
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: List.generate(4, (i) {
-                            return SizedBox(
-                              width: 48,
-                              child: TextField(
-                                controller: _controllers[i],
-                                focusNode: _focusNodes[i],
-                                keyboardType: TextInputType.number,
-                                textAlign: TextAlign.center,
-                                maxLength: 1,
-                                style: const TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.darkNavy,
-                                ),
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                decoration: const InputDecoration(
-                                  counterText: '',
-                                  border: InputBorder.none,
-                                  hintText: '0',
-                                  hintStyle: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.graySubtle,
-                                  ),
-                                ),
-                                onChanged: (v) => _onChanged(i, v),
-                              ),
-                            );
-                          }),
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: FilledButton(
-                          onPressed: _allFilled
-                              ? () {
-                                  context.read<AuthBloc>().add(AuthVerify(
-                                        phone: widget.phone,
-                                        code: _code,
-                                      ));
-                                }
-                              : null,
-                          style: FilledButton.styleFrom(
-                            backgroundColor: _allFilled
-                                ? AppColors.gold
-                                : AppColors.goldLight,
-                            foregroundColor: _allFilled
-                                ? AppColors.darkNavy
-                                : AppColors.grayText,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(28),
-                            ),
-                          ),
-                          child: const Text(
-                            'TASDIQLASH',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.2,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: List.generate(4, (i) => _buildBox(i)),
+                    ),
                   ),
                 ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: _clearAll,
+                  child: Container(
+                    width: 52,
+                    height: 68,
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(
+                      Icons.backspace_outlined,
+                      color: AppColors.grayText,
+                      size: 22,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            FilledButton(
+              onPressed: _allFilled
+                  ? () {
+                      context.read<AuthBloc>().add(AuthVerify(
+                            phone: widget.phone,
+                            code: _code,
+                          ));
+                    }
+                  : null,
+              style: FilledButton.styleFrom(
+                backgroundColor:
+                    _allFilled ? AppColors.darkNavy : AppColors.graySubtle,
+              ),
+              child: const Text('TASDIQLASH'),
+            ),
+            const SizedBox(height: 16),
+            GestureDetector(
+              onTap: () => context.read<AuthBloc>().add(AuthLogout()),
+              child: const Text(
+                'ORQAGA',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.grayText,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1,
+                ),
               ),
             ),
+            const Spacer(flex: 2),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBox(int index) {
+    return SizedBox(
+      width: 52,
+      child: TextField(
+        controller: _controllers[index],
+        focusNode: _focusNodes[index],
+        keyboardType: TextInputType.number,
+        textAlign: TextAlign.center,
+        maxLength: 1,
+        style: const TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w700,
+          color: AppColors.darkNavy,
+        ),
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        decoration: const InputDecoration(
+          counterText: '',
+          border: InputBorder.none,
+          hintText: '·',
+          hintStyle: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+            color: AppColors.graySubtle,
+          ),
+          contentPadding: EdgeInsets.symmetric(vertical: 14),
+        ),
+        onChanged: (v) => _onBoxChanged(index, v),
       ),
     );
   }
