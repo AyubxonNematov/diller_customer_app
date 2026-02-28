@@ -87,11 +87,6 @@ class _WelcomeView extends StatelessWidget {
               onPressed: onLogin,
               child: const Text('KIRISH'),
             ),
-            const SizedBox(height: 14),
-            OutlinedButton(
-              onPressed: onLogin,
-              child: const Text("RO'YXATDAN O'TISH"),
-            ),
             const SizedBox(height: 24),
             Text(
               'TEST RAQAM: 99 888 77 66',

@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sement_market_customer/core/api/api_client.dart';
 import 'package:sement_market_customer/core/di/injection.dart';
+import 'package:sement_market_customer/core/utils/api_error.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -58,11 +59,5 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthInitial());
   }
 
-  String _parseError(dynamic e) {
-    if (e is Exception) {
-      final str = e.toString();
-      if (str.contains('message')) return str;
-    }
-    return e.toString();
-  }
+  String _parseError(dynamic e) => parseApiError(e);
 }
