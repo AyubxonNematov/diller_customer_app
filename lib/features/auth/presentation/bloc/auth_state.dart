@@ -14,6 +14,15 @@ final class AuthCodeSent extends AuthState {
   final String phone;
 }
 
+final class AuthNeedsRegistration extends AuthState {
+  AuthNeedsRegistration({required this.tempToken, required this.phone});
+  final String tempToken;
+  final String phone;
+
+  @override
+  List<Object?> get props => [tempToken, phone];
+}
+
 final class AuthAuthenticated extends AuthState {
   AuthAuthenticated({required this.token, required this.customer});
   final String token;

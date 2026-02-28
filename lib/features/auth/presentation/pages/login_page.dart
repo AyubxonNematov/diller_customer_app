@@ -30,6 +30,12 @@ class _LoginPageState extends State<LoginPage> {
           }
         },
         builder: (context, state) {
+          if (state is AuthNeedsRegistration) {
+            return _RegisterView(
+              tempToken: state.tempToken,
+              phone: state.phone,
+            );
+          }
           if (state is AuthCodeSent) {
             return _OtpVerifyView(phone: state.phone);
           }
@@ -503,6 +509,201 @@ class _OtpVerifyViewState extends State<_OtpVerifyView> {
           contentPadding: EdgeInsets.symmetric(vertical: 14),
         ),
         onChanged: (v) => _onBoxChanged(index, v),
+      ),
+    );
+  }
+}
+
+// ─── Screen 4: Registration ───
+
+class _RegisterView extends StatefulWidget {
+  const _RegisterView({required this.tempToken, required this.phone});
+  final String tempToken;
+  final String phone;
+
+  @override
+  State<_RegisterView> createState() => _RegisterViewState();
+}
+
+class _RegisterViewState extends State<_RegisterView> {
+  final _nameController = TextEditingController();
+  final _surnameController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _nameFocus = FocusNode();
+  final _surnameFocus = FocusNode();
+  final _addressFocus = FocusNode();
+
+  bool get _canSubmit => _nameController.text.trim().isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _surnameController.dispose();
+    _addressController.dispose();
+    _nameFocus.dispose();
+    _surnameFocus.dispose();
+    _addressFocus.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    context.read<AuthBloc>().add(AuthRegister(
+          tempToken: widget.tempToken,
+          name: _nameController.text.trim(),
+          surname: _surnameController.text.trim().isEmpty
+              ? null
+              : _surnameController.text.trim(),
+          address: _addressController.text.trim().isEmpty
+              ? null
+              : _addressController.text.trim(),
+        ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 40),
+            const Center(child: _LogoWidget(size: 70)),
+            const SizedBox(height: 32),
+            const Text(
+              'Ro\'yxatdan o\'tish',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: AppColors.darkNavy,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '+${widget.phone} RAQAMI UCHUN',
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: AppColors.grayText,
+                letterSpacing: 1.2,
+              ),
+            ),
+            const SizedBox(height: 28),
+            _buildLabel('ISM *'),
+            const SizedBox(height: 8),
+            _buildField(
+              controller: _nameController,
+              focusNode: _nameFocus,
+              hint: 'Ali',
+              nextFocus: _surnameFocus,
+            ),
+            const SizedBox(height: 16),
+            _buildLabel('FAMILIYA'),
+            const SizedBox(height: 8),
+            _buildField(
+              controller: _surnameController,
+              focusNode: _surnameFocus,
+              hint: 'Karimov',
+              nextFocus: _addressFocus,
+            ),
+            const SizedBox(height: 16),
+            _buildLabel('MANZIL'),
+            const SizedBox(height: 8),
+            _buildField(
+              controller: _addressController,
+              focusNode: _addressFocus,
+              hint: 'Toshkent, Chilonzor tumani...',
+              maxLines: 2,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _canSubmit ? _submit() : null,
+            ),
+            const SizedBox(height: 32),
+            FilledButton(
+              onPressed: _canSubmit ? _submit : null,
+              style: FilledButton.styleFrom(
+                backgroundColor:
+                    _canSubmit ? AppColors.darkNavy : AppColors.graySubtle,
+              ),
+              child: const Text('SAQLASH VA KIRISH'),
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: GestureDetector(
+                onTap: () => context.read<AuthBloc>().add(AuthLogout()),
+                child: const Text(
+                  'ORQAGA',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.grayText,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLabel(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+        color: AppColors.grayText,
+        letterSpacing: 1.2,
+      ),
+    );
+  }
+
+  Widget _buildField({
+    required TextEditingController controller,
+    required FocusNode focusNode,
+    required String hint,
+    FocusNode? nextFocus,
+    int maxLines = 1,
+    TextInputAction textInputAction = TextInputAction.next,
+    ValueChanged<String>? onSubmitted,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: TextField(
+        controller: controller,
+        focusNode: focusNode,
+        maxLines: maxLines,
+        textInputAction: textInputAction,
+        style: const TextStyle(
+          fontSize: 16,
+          color: AppColors.darkNavy,
+          fontWeight: FontWeight.w500,
+        ),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(
+            color: AppColors.graySubtle,
+            fontSize: 16,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 14),
+        ),
+        onSubmitted: onSubmitted ??
+            (_) {
+              if (nextFocus != null) nextFocus.requestFocus();
+            },
       ),
     );
   }

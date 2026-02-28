@@ -17,4 +17,19 @@ final class AuthVerify extends AuthEvent {
   final String? name;
 }
 
+final class AuthRegister extends AuthEvent {
+  AuthRegister({
+    required this.tempToken,
+    required this.name,
+    this.surname,
+    this.address,
+    this.leafRegionId,
+  });
+  final String tempToken;
+  final String name;
+  final String? surname;
+  final String? address;
+  final int? leafRegionId;
+}
+
 final class AuthLogout extends AuthEvent {}
