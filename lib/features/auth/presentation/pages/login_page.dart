@@ -61,9 +61,8 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 class _LogoWidget extends StatelessWidget {
-  const _LogoWidget({this.size = 80, this.onDark = false});
+  const _LogoWidget({this.size = 80});
   final double size;
-  final bool onDark;
 
   @override
   Widget build(BuildContext context) {
