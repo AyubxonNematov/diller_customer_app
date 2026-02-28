@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sement_market_customer/core/debug/alice_setup.dart';
+import 'package:sement_market_customer/core/permissions/permission_page.dart';
 import 'package:sement_market_customer/core/theme/app_theme.dart';
 import 'package:sement_market_customer/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sement_market_customer/features/auth/presentation/pages/login_page.dart';
@@ -16,20 +17,22 @@ abstract class AppRouter {
 
   static GoRouter get router => GoRouter(
         navigatorKey: navigatorKey,
-        initialLocation: '/login',
+        initialLocation: '/permissions',
         redirect: (context, state) async {
+          final loc = state.matchedLocation;
+          if (loc == '/permissions') return null;
           final prefs = await SharedPreferences.getInstance();
           final token = prefs.getString('auth_token');
-          final isLoginRoute = state.matchedLocation == '/login';
-          if (token != null && isLoginRoute) {
-            return '/profile';
-          }
-          if (token == null && !isLoginRoute) {
-            return '/login';
-          }
+          final isLoginRoute = loc == '/login';
+          if (token != null && isLoginRoute) return '/profile';
+          if (token == null && !isLoginRoute) return '/login';
           return null;
         },
         routes: [
+          GoRoute(
+            path: '/permissions',
+            builder: (_, __) => const PermissionPage(),
+          ),
           GoRoute(
             path: '/login',
             builder: (_, __) => BlocProvider(
