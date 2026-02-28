@@ -64,30 +64,57 @@ class _LogoWidget extends StatelessWidget {
         Container(
           width: size,
           height: size,
-          decoration: const BoxDecoration(
-            color: AppColors.goldLight,
-            shape: BoxShape.circle,
+          decoration: BoxDecoration(
+            color: AppColors.gold,
+            borderRadius: BorderRadius.circular(size * 0.25),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.gold.withValues(alpha: 0.3),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
-          child: Center(
-            child: ClipOval(
-              child: Image.asset(
-                'assets/brand.jpg',
-                width: size * 0.6,
-                height: size * 0.6,
-                fit: BoxFit.cover,
+          child: const SizedBox.shrink(),
+        ),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              'DILLER',
+              style: TextStyle(
+                fontSize: size * 0.28,
+                fontWeight: FontWeight.w900,
+                color: onDark ? Colors.white : AppColors.darkNavy,
+                letterSpacing: 0.5,
+                height: 1,
               ),
             ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          'SEMENT.MARKET',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w900,
-            color: onDark ? Colors.white : AppColors.darkNavy,
-            letterSpacing: 0.5,
-          ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: Container(
+                width: size * 0.07,
+                height: size * 0.07,
+                decoration: const BoxDecoration(
+                  color: AppColors.gold,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+            Text(
+              'MARKET',
+              style: TextStyle(
+                fontSize: size * 0.28,
+                fontWeight: FontWeight.w900,
+                color: onDark ? Colors.white : AppColors.darkNavy,
+                letterSpacing: 0.5,
+                height: 1,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 4),
         Text(
