@@ -163,4 +163,43 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get notificationsSettings => 'Уведомления';
+
+  @override
+  String get dealerSearchHint => 'Поиск дилера...';
+
+  @override
+  String get categoryAll => 'ВСЕ';
+
+  @override
+  String get dealersEmpty => 'Дилеры не найдены';
+
+  @override
+  String get dealersEmptyHint => 'Попробуйте другую категорию или поиск';
+
+  @override
+  String get dealersError => 'Произошла ошибка';
+
+  @override
+  String get dealersErrorHint => 'Проверьте подключение к интернету';
+
+  @override
+  String get dealersLoading => 'Загрузка...';
+
+  @override
+  String get filter => 'Фильтр';
+
+  @override
+  String get filterCategory => 'Категория';
+
+  @override
+  String get filterRegion => 'Регион';
+
+  @override
+  String get filterApply => 'Применить';
+
+  @override
+  String get filterClear => 'Очистить';
+
+  @override
+  String get filterRegionAll => 'Все регионы';
 }

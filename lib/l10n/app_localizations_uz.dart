@@ -163,4 +163,44 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get notificationsSettings => 'Bildirishnomalar';
+
+  @override
+  String get dealerSearchHint => 'Diller qidirish...';
+
+  @override
+  String get categoryAll => 'BARCHASI';
+
+  @override
+  String get dealersEmpty => 'Diller topilmadi';
+
+  @override
+  String get dealersEmptyHint =>
+      'Boshqa kategoriya yoki qidiruvni sinab ko\'ring';
+
+  @override
+  String get dealersError => 'Xatolik yuz berdi';
+
+  @override
+  String get dealersErrorHint => 'Internet aloqasini tekshiring';
+
+  @override
+  String get dealersLoading => 'Yuklanmoqda...';
+
+  @override
+  String get filter => 'Filter';
+
+  @override
+  String get filterCategory => 'Kategoriya';
+
+  @override
+  String get filterRegion => 'Hudud';
+
+  @override
+  String get filterApply => 'Qo\'llash';
+
+  @override
+  String get filterClear => 'Tozalash';
+
+  @override
+  String get filterRegionAll => 'Barcha hududlar';
 }

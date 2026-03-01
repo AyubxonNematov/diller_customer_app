@@ -62,5 +62,18 @@
   "langUz": "O'zbekcha",
   "langRu": "Русский",
   "settings": "Sozlamalar",
-  "notificationsSettings": "Bildirishnomalar"
+  "notificationsSettings": "Bildirishnomalar",
+  "dealerSearchHint": "Diller qidirish...",
+  "categoryAll": "BARCHASI",
+  "dealersEmpty": "Diller topilmadi",
+  "dealersEmptyHint": "Boshqa kategoriya yoki qidiruvni sinab ko'ring",
+  "dealersError": "Xatolik yuz berdi",
+  "dealersErrorHint": "Internet aloqasini tekshiring",
+  "dealersLoading": "Yuklanmoqda...",
+  "filter": "Filter",
+  "filterCategory": "Kategoriya",
+  "filterRegion": "Hudud",
+  "filterApply": "Qo'llash",
+  "filterClear": "Tozalash",
+  "filterRegionAll": "Barcha hududlar"
 }

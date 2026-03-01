@@ -47,5 +47,18 @@
   "langUz": "O'zbekcha",
   "langRu": "Русский",
   "settings": "Настройки",
-  "notificationsSettings": "Уведомления"
+  "notificationsSettings": "Уведомления",
+  "dealerSearchHint": "Поиск дилера...",
+  "categoryAll": "ВСЕ",
+  "dealersEmpty": "Дилеры не найдены",
+  "dealersEmptyHint": "Попробуйте другую категорию или поиск",
+  "dealersError": "Произошла ошибка",
+  "dealersErrorHint": "Проверьте подключение к интернету",
+  "dealersLoading": "Загрузка...",
+  "filter": "Фильтр",
+  "filterCategory": "Категория",
+  "filterRegion": "Регион",
+  "filterApply": "Применить",
+  "filterClear": "Очистить",
+  "filterRegionAll": "Все регионы"
 }

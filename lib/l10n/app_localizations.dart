@@ -391,6 +391,84 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Bildirishnomalar'**
   String get notificationsSettings;
+
+  /// No description provided for @dealerSearchHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Diller qidirish...'**
+  String get dealerSearchHint;
+
+  /// No description provided for @categoryAll.
+  ///
+  /// In uz, this message translates to:
+  /// **'BARCHASI'**
+  String get categoryAll;
+
+  /// No description provided for @dealersEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Diller topilmadi'**
+  String get dealersEmpty;
+
+  /// No description provided for @dealersEmptyHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqa kategoriya yoki qidiruvni sinab ko\'ring'**
+  String get dealersEmptyHint;
+
+  /// No description provided for @dealersError.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xatolik yuz berdi'**
+  String get dealersError;
+
+  /// No description provided for @dealersErrorHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Internet aloqasini tekshiring'**
+  String get dealersErrorHint;
+
+  /// No description provided for @dealersLoading.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yuklanmoqda...'**
+  String get dealersLoading;
+
+  /// No description provided for @filter.
+  ///
+  /// In uz, this message translates to:
+  /// **'Filter'**
+  String get filter;
+
+  /// No description provided for @filterCategory.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kategoriya'**
+  String get filterCategory;
+
+  /// No description provided for @filterRegion.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hudud'**
+  String get filterRegion;
+
+  /// No description provided for @filterApply.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qo\'llash'**
+  String get filterApply;
+
+  /// No description provided for @filterClear.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tozalash'**
+  String get filterClear;
+
+  /// No description provided for @filterRegionAll.
+  ///
+  /// In uz, this message translates to:
+  /// **'Barcha hududlar'**
+  String get filterRegionAll;
 }
 
 class _AppLocalizationsDelegate
