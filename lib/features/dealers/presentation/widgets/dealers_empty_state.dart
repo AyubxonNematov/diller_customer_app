@@ -6,12 +6,19 @@ class DealersEmptyState extends StatelessWidget {
   const DealersEmptyState({
     super.key,
     this.onRetry,
+    this.onClearFilters,
+    this.hasActiveFilters = false,
   });
 
   final VoidCallback? onRetry;
+  final VoidCallback? onClearFilters;
+  final bool hasActiveFilters;
 
   @override
   Widget build(BuildContext context) {
+    final showClearFilters = hasActiveFilters && onClearFilters != null;
+    final showRetry = !showClearFilters && onRetry != null;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -51,7 +58,22 @@ class DealersEmptyState extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            if (onRetry != null) ...[
+            if (showClearFilters) ...[
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: onClearFilters,
+                icon: const Icon(Icons.filter_alt_off_rounded, size: 20),
+                label: Text(AppLocalizations.of(context)!.clearFiltersShowAll),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.darkNavy,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ] else if (showRetry) ...[
               const SizedBox(height: 24),
               FilledButton.icon(
                 onPressed: onRetry,
@@ -59,7 +81,8 @@ class DealersEmptyState extends StatelessWidget {
                 label: Text(AppLocalizations.of(context)!.retry),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.darkNavy,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

@@ -203,4 +203,7 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get filterRegionAll => 'Barcha hududlar';
+
+  @override
+  String get clearFiltersShowAll => 'Filterni tozalash';
 }

@@ -71,13 +71,18 @@ class DealersBloc extends Bloc<DealersEvent, DealersState> {
     String? search,
     int page = 1,
     bool appendDealers = false,
+    bool replaceFilters = false,
   }) async {
     try {
       final prev = state is DealersLoaded ? state as DealersLoaded : null;
+      final effectiveCategoryId =
+          replaceFilters ? categoryId : (categoryId ?? prev?.selectedCategoryId);
+      final effectiveRegionId =
+          replaceFilters ? regionId : (regionId ?? prev?.selectedRegionId);
 
       final dealersRes = await _api.getDealers(
-        categoryId: categoryId ?? prev?.selectedCategoryId,
-        regionId: regionId ?? prev?.selectedRegionId,
+        categoryId: effectiveCategoryId,
+        regionId: effectiveRegionId,
         location: _location,
         search: search ?? prev?.searchQuery,
         page: page,
@@ -90,8 +95,8 @@ class DealersBloc extends Bloc<DealersEvent, DealersState> {
 
       emit(DealersLoaded(
         dealers: dealers,
-        selectedCategoryId: categoryId ?? prev?.selectedCategoryId,
-        selectedRegionId: regionId ?? prev?.selectedRegionId,
+        selectedCategoryId: effectiveCategoryId,
+        selectedRegionId: effectiveRegionId,
         searchQuery: search ?? prev?.searchQuery ?? '',
         location: _location,
         meta: dealersRes.meta,
@@ -119,7 +124,8 @@ class DealersBloc extends Bloc<DealersEvent, DealersState> {
   ) async {
     if (state is! DealersLoaded) return;
     final s = state as DealersLoaded;
-    await _loadDealers(emit,
+    await _loadDealers(
+      emit,
       search: event.query,
       categoryId: s.selectedCategoryId,
       regionId: s.selectedRegionId,
@@ -132,10 +138,12 @@ class DealersBloc extends Bloc<DealersEvent, DealersState> {
   ) async {
     if (state is! DealersLoaded) return;
     final s = state as DealersLoaded;
-    await _loadDealers(emit,
+    await _loadDealers(
+      emit,
       categoryId: event.categoryId,
       regionId: event.regionId,
       search: s.searchQuery,
+      replaceFilters: true,
     );
   }
 
@@ -161,7 +169,8 @@ class DealersBloc extends Bloc<DealersEvent, DealersState> {
     final s = state as DealersLoaded;
     if (!s.hasMore || s.isLoadingMore) return;
     emit(s.copyWith(isLoadingMore: true));
-    await _loadDealers(emit,
+    await _loadDealers(
+      emit,
       categoryId: s.selectedCategoryId,
       regionId: s.selectedRegionId,
       search: s.searchQuery,

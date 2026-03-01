@@ -469,6 +469,12 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Barcha hududlar'**
   String get filterRegionAll;
+
+  /// No description provided for @clearFiltersShowAll.
+  ///
+  /// In uz, this message translates to:
+  /// **'Filterni tozalash'**
+  String get clearFiltersShowAll;
 }
 
 class _AppLocalizationsDelegate

@@ -70,7 +70,8 @@ class DealersErrorState extends StatelessWidget {
               label: Text(AppLocalizations.of(context)!.retry),
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.darkNavy,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

@@ -202,4 +202,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get filterRegionAll => 'Все регионы';
+
+  @override
+  String get clearFiltersShowAll => 'Очистить фильтр';
 }

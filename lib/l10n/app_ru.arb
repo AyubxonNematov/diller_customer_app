@@ -60,5 +60,6 @@
   "filterRegion": "Регион",
   "filterApply": "Применить",
   "filterClear": "Очистить",
-  "filterRegionAll": "Все регионы"
+  "filterRegionAll": "Все регионы",
+  "clearFiltersShowAll": "Очистить фильтр"
 }

@@ -150,9 +150,9 @@ class _DealersPageState extends State<DealersPage> {
       currentRegionId: state.selectedRegionId,
       onApply: ({categoryId, regionId}) {
         bloc.add(DealersFiltersApplied(
-              categoryId: categoryId,
-              regionId: regionId,
-            ));
+          categoryId: categoryId,
+          regionId: regionId,
+        ));
       },
     );
   }
@@ -173,7 +173,8 @@ class _DealersPageState extends State<DealersPage> {
             builder: (context, state) {
               return DealerSearchBar(
                 searchQuery: state is DealersLoaded ? state.searchQuery : null,
-                activeFiltersCount: state is DealersLoaded ? state.activeFiltersCount : 0,
+                activeFiltersCount:
+                    state is DealersLoaded ? state.activeFiltersCount : 0,
                 onChanged: (q) => context.read<DealersBloc>().add(
                       DealersSearchChanged(q),
                     ),
@@ -190,17 +191,22 @@ class _DealersPageState extends State<DealersPage> {
                 if (state is DealersError) {
                   return DealersErrorState(
                     message: state.message,
-                    onRetry: () => context
-                        .read<DealersBloc>()
-                        .add(const DealersLoad()),
+                    onRetry: () =>
+                        context.read<DealersBloc>().add(const DealersLoad()),
                   );
                 }
                 if (state is DealersLoaded) {
                   if (state.dealers.isEmpty && !state.isRefreshing) {
                     return DealersEmptyState(
-                      onRetry: () => context
-                          .read<DealersBloc>()
-                          .add(const DealersLoad()),
+                      hasActiveFilters: state.activeFiltersCount > 0,
+                      onRetry: () =>
+                          context.read<DealersBloc>().add(const DealersLoad()),
+                      onClearFilters: () => context.read<DealersBloc>().add(
+                            const DealersFiltersApplied(
+                              categoryId: null,
+                              regionId: null,
+                            ),
+                          ),
                     );
                   }
                   return Stack(
@@ -218,8 +224,8 @@ class _DealersPageState extends State<DealersPage> {
                                 (state.hasMore ? 60 : 0) +
                                 MediaQuery.of(context).padding.bottom,
                           ),
-                          itemCount: state.dealers.length +
-                              (state.hasMore ? 1 : 0),
+                          itemCount:
+                              state.dealers.length + (state.hasMore ? 1 : 0),
                           itemBuilder: (context, index) {
                             if (index >= state.dealers.length) {
                               WidgetsBinding.instance.addPostFrameCallback((_) {

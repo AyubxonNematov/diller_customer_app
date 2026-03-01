@@ -75,5 +75,6 @@
   "filterRegion": "Hudud",
   "filterApply": "Qo'llash",
   "filterClear": "Tozalash",
-  "filterRegionAll": "Barcha hududlar"
+  "filterRegionAll": "Barcha hududlar",
+  "clearFiltersShowAll": "Filterni tozalash"
 }

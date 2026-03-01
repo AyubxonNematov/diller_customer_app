@@ -37,33 +37,23 @@ class DealersApi {
     );
   }
 
-  Future<List<CategoryModel>> getCategories() async {
-    final r = await _client.dio.get('/categories');
-    final data = (r.data as Map<String, dynamic>)['data'] as List<dynamic>? ?? [];
+  Future<List<CategoryModel>> getCategories({int? parentId}) async {
+    final params = <String, dynamic>{};
+    params['filter[parent_id]'] = parentId == null ? 'null' : parentId.toString();
+    final r = await _client.dio.get('/categories', queryParameters: params);
+    final data =
+        (r.data as Map<String, dynamic>)['data'] as List<dynamic>? ?? [];
     return data
         .map((e) => CategoryModel.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
-  Future<List<CategoryModel>> getCategoryChildren(int parentId) async {
-    final r = await _client.dio.get('/categories/$parentId/children');
-    final data = (r.data as Map<String, dynamic>)['data'] as List<dynamic>? ?? [];
-    return data
-        .map((e) => CategoryModel.fromJson(e as Map<String, dynamic>))
-        .toList();
-  }
-
-  Future<List<RegionModel>> getRegions() async {
-    final r = await _client.dio.get('/regions');
-    final data = (r.data as Map<String, dynamic>)['data'] as List<dynamic>? ?? [];
-    return data
-        .map((e) => RegionModel.fromJson(e as Map<String, dynamic>))
-        .toList();
-  }
-
-  Future<List<RegionModel>> getRegionChildren(int parentId) async {
-    final r = await _client.dio.get('/regions/$parentId/children');
-    final data = (r.data as Map<String, dynamic>)['data'] as List<dynamic>? ?? [];
+  Future<List<RegionModel>> getRegions({int? parentId}) async {
+    final params = <String, dynamic>{};
+    params['filter[parent_id]'] = parentId == null ? 'null' : parentId.toString();
+    final r = await _client.dio.get('/regions', queryParameters: params);
+    final data =
+        (r.data as Map<String, dynamic>)['data'] as List<dynamic>? ?? [];
     return data
         .map((e) => RegionModel.fromJson(e as Map<String, dynamic>))
         .toList();
