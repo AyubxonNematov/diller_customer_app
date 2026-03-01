@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sement_market_customer/core/theme/app_theme.dart';
 import 'package:sement_market_customer/l10n/app_localizations.dart';
@@ -254,7 +255,10 @@ class _DealersPageState extends State<DealersPage> {
                               key: ValueKey(dealer.id),
                               dealer: dealer,
                               onTap: () {
-                                // TODO: context.push('/diller/${dealer.id}');
+                                context.push(
+                                  '/diller/${dealer.id}',
+                                  extra: dealer,
+                                );
                               },
                             );
                           },

@@ -61,5 +61,8 @@
   "filterApply": "Применить",
   "filterClear": "Очистить",
   "filterRegionAll": "Все регионы",
-  "clearFiltersShowAll": "Очистить фильтр"
+  "clearFiltersShowAll": "Очистить фильтр",
+  "warehouseSearchHint": "Поиск складов...",
+  "warehousesEmpty": "Склады не найдены",
+  "warehousesEmptyHint": "Измените поиск или попробуйте позже"
 }

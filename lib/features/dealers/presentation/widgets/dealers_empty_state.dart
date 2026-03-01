@@ -8,16 +8,22 @@ class DealersEmptyState extends StatelessWidget {
     this.onRetry,
     this.onClearFilters,
     this.hasActiveFilters = false,
+    this.emptyTitle,
+    this.emptyHint,
   });
 
   final VoidCallback? onRetry;
   final VoidCallback? onClearFilters;
   final bool hasActiveFilters;
+  final String? emptyTitle;
+  final String? emptyHint;
 
   @override
   Widget build(BuildContext context) {
     final showClearFilters = hasActiveFilters && onClearFilters != null;
     final showRetry = !showClearFilters && onRetry != null;
+    final title = emptyTitle ?? AppLocalizations.of(context)!.dealersEmpty;
+    final hint = emptyHint ?? AppLocalizations.of(context)!.dealersEmptyHint;
 
     return Center(
       child: Padding(
@@ -40,7 +46,7 @@ class DealersEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              AppLocalizations.of(context)!.dealersEmpty,
+              title,
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -50,7 +56,7 @@ class DealersEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              AppLocalizations.of(context)!.dealersEmptyHint,
+              hint,
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.grayText,

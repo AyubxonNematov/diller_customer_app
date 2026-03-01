@@ -475,6 +475,24 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Filterni tozalash'**
   String get clearFiltersShowAll;
+
+  /// No description provided for @warehouseSearchHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Omborlarni qidirish...'**
+  String get warehouseSearchHint;
+
+  /// No description provided for @warehousesEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Omborlar topilmadi'**
+  String get warehousesEmpty;
+
+  /// No description provided for @warehousesEmptyHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qidiruvni o\'zgartiring yoki keyinroq urinib ko\'ring'**
+  String get warehousesEmptyHint;
 }
 
 class _AppLocalizationsDelegate

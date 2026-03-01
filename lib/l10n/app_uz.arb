@@ -76,5 +76,8 @@
   "filterApply": "Qo'llash",
   "filterClear": "Tozalash",
   "filterRegionAll": "Barcha hududlar",
-  "clearFiltersShowAll": "Filterni tozalash"
+  "clearFiltersShowAll": "Filterni tozalash",
+  "warehouseSearchHint": "Omborlarni qidirish...",
+  "warehousesEmpty": "Omborlar topilmadi",
+  "warehousesEmptyHint": "Qidiruvni o'zgartiring yoki keyinroq urinib ko'ring"
 }

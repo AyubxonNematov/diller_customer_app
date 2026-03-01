@@ -205,4 +205,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get clearFiltersShowAll => 'Очистить фильтр';
+
+  @override
+  String get warehouseSearchHint => 'Поиск складов...';
+
+  @override
+  String get warehousesEmpty => 'Склады не найдены';
+
+  @override
+  String get warehousesEmptyHint => 'Измените поиск или попробуйте позже';
 }

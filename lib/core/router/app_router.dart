@@ -7,7 +7,10 @@ import 'package:sement_market_customer/core/firebase/firebase_notifications.dart
 import 'package:sement_market_customer/core/theme/app_theme.dart';
 import 'package:sement_market_customer/l10n/app_localizations.dart';
 import 'package:sement_market_customer/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:sement_market_customer/features/dealers/data/models/dealer_model.dart';
 import 'package:sement_market_customer/features/dealers/presentation/bloc/dealers_bloc.dart';
+import 'package:sement_market_customer/features/dealers/presentation/bloc/warehouses_bloc.dart';
+import 'package:sement_market_customer/features/dealers/presentation/pages/dealer_warehouses_page.dart';
 import 'package:sement_market_customer/features/dealers/presentation/pages/dealers_page.dart';
 import 'package:sement_market_customer/features/auth/presentation/pages/login_page.dart';
 import 'package:sement_market_customer/features/notifications/presentation/pages/notifications_page.dart';
@@ -51,6 +54,21 @@ abstract class AppRouter {
                 routes: [
                   GoRoute(
                     path: '/diller',
+                    routes: [
+                      GoRoute(
+                        path: ':id',
+                        builder: (context, state) {
+                          final dealer = state.extra as DealerModel?;
+                          if (dealer == null) {
+                            return const SizedBox.shrink();
+                          }
+                          return BlocProvider(
+                            create: (_) => WarehousesBloc(dealer: dealer),
+                            child: DealerWarehousesPage(dealer: dealer),
+                          );
+                        },
+                      ),
+                    ],
                     builder: (_, __) => BlocProvider(
                       create: (_) => DealersBloc(),
                       child: const DealersPage(),

@@ -2,6 +2,7 @@ import 'package:sement_market_customer/core/api/api_client.dart';
 import 'package:sement_market_customer/core/di/injection.dart';
 import 'package:sement_market_customer/features/dealers/data/models/category_model.dart';
 import 'package:sement_market_customer/features/dealers/data/models/paginated_dealers_response.dart';
+import 'package:sement_market_customer/features/dealers/data/models/paginated_warehouses_response.dart';
 import 'package:sement_market_customer/features/dealers/data/models/region_model.dart';
 
 class DealersApi {
@@ -57,5 +58,27 @@ class DealersApi {
     return data
         .map((e) => RegionModel.fromJson(e as Map<String, dynamic>))
         .toList();
+  }
+
+  Future<PaginatedWarehousesResponse> getWarehouses({
+    required int dealerId,
+    String? search,
+    String? location,
+    int page = 1,
+  }) async {
+    final params = <String, dynamic>{'page': page};
+    if (location != null && location.isNotEmpty) {
+      params['filter[location]'] = location;
+    }
+    if (search != null && search.trim().isNotEmpty) {
+      params['filter[search]'] = search.trim();
+    }
+    final r = await _client.dio.get(
+      '/dealers/$dealerId/warehouses',
+      queryParameters: params,
+    );
+    return PaginatedWarehousesResponse.fromJson(
+      r.data as Map<String, dynamic>,
+    );
   }
 }
