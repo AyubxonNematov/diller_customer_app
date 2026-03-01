@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:sement_market_customer/l10n/app_localizations.dart';
 
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Bildirishnomalar'),
-          bottom: const TabBar(
+          title: Text(l10n.notifications),
+          bottom: TabBar(
             tabs: [
-              Tab(text: 'General'),
-              Tab(text: 'Primary'),
+              Tab(text: l10n.general),
+              Tab(text: l10n.primary),
             ],
           ),
         ),
-        body: const TabBarView(
+        body: TabBarView(
           children: [
-            _NotificationList(type: 'general'),
-            _NotificationList(type: 'primary'),
+            _NotificationList(title: l10n.notificationsList(l10n.general)),
+            _NotificationList(title: l10n.notificationsList(l10n.primary)),
           ],
         ),
       ),
@@ -29,15 +31,13 @@ class NotificationsPage extends StatelessWidget {
 }
 
 class _NotificationList extends StatelessWidget {
-  const _NotificationList({required this.type});
-  final String type;
+  const _NotificationList({required this.title});
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: [
-        ListTile(title: Text('$type — bildirishnomalar')),
-      ],
+      children: [ListTile(title: Text(title))],
     );
   }
 }

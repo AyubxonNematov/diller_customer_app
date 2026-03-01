@@ -1,0 +1,66 @@
+{
+  "login": "KIRISH",
+  "testPhone": "TEST RAQAM: 99 888 77 66",
+  "loginTitle": "Tizimga kirish",
+  "phoneHint": "TELEFON RAQAMINGIZNI KIRITING",
+  "continueBtn": "DAVOM ETISH",
+  "back": "ORQAGA",
+  "confirm": "Tasdiqlash",
+  "codeSentTo": "+{phone} RAQAMIGA KOD YUBORILDI",
+  "@codeSentTo": {
+    "placeholders": {
+      "phone": {"type": "String"}
+    }
+  },
+  "verify": "TASDIQLASH",
+  "register": "Ro'yxatdan o'tish",
+  "registerForPhone": "+{phone} RAQAMI UCHUN",
+  "@registerForPhone": {
+    "placeholders": {
+      "phone": {"type": "String"}
+    }
+  },
+  "nameRequired": "ISM *",
+  "surname": "FAMILIYA",
+  "address": "MANZIL",
+  "saveAndLogin": "SAQLASH VA KIRISH",
+  "profile": "Profil",
+  "logout": "CHIQISH",
+  "marketplace": "MARKETPLACE",
+  "sum": "sum",
+  "myAccount": "MENING HISOBIM",
+  "dillerMarketGold": "Diller Market Gold",
+  "earnedSalary": "TO'PLANGAN ISH HAQI",
+  "withdraw": "YECHIB OLISH",
+  "salaryRules": "ISH HAQI TIZIMI QOIDALARI",
+  "rule1": "Har bir mahsulot haridi uchun sizga kafolatlangan ish haqi yoziladi.",
+  "rule2": "Ish haqini naqdilashtirish uchun ariza 24 soat davomida ko'rib chiqiladi.",
+  "rule3": "Minimal yechish miqdori: 10 000 sum.",
+  "retry": "QAYTA URINISH",
+  "user": "Foydalanuvchi",
+  "navDiller": "DILLER",
+  "navZakazlar": "ZAKAZLAR",
+  "navSavat": "SAVAT",
+  "navProfile": "PROFIL",
+  "locationPermission": "Joylashuvga ruxsat",
+  "locationDesc": "Yaqin dillerlarni topish uchun joylashuvingizga ruxsat bering",
+  "grantPermission": "Ruxsat berish",
+  "openSettings": "Sozlamalarga o'tish",
+  "later": "Keyinroq",
+  "notifications": "Bildirishnomalar",
+  "general": "General",
+  "primary": "Primary",
+  "notificationsList": "{type} — bildirishnomalar",
+  "@notificationsList": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "zakazlar": "Zakazlar",
+  "savat": "Savat",
+  "language": "Til",
+  "langUz": "O'zbekcha",
+  "langRu": "Русский",
+  "settings": "Sozlamalar",
+  "notificationsSettings": "Bildirishnomalar"
+}

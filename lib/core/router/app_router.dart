@@ -6,9 +6,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sement_market_customer/core/debug/alice_setup.dart';
 import 'package:sement_market_customer/core/firebase/firebase_notifications.dart';
 import 'package:sement_market_customer/core/theme/app_theme.dart';
+import 'package:sement_market_customer/l10n/app_localizations.dart';
 import 'package:sement_market_customer/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sement_market_customer/features/auth/presentation/pages/login_page.dart';
 import 'package:sement_market_customer/features/notifications/presentation/pages/notifications_page.dart';
+import 'package:sement_market_customer/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:sement_market_customer/features/profile/presentation/pages/profile_page.dart';
 
 abstract class AppRouter {
@@ -37,9 +39,12 @@ abstract class AppRouter {
             ),
           ),
           ShellRoute(
-            builder: (context, state, child) => _MainShell(
-              location: state.matchedLocation,
-              child: _FcmSyncWrapper(child: child),
+            builder: (context, state, child) => BlocProvider(
+              create: (_) => ProfileBloc()..add(const ProfileLoad()),
+              child: _MainShell(
+                location: state.matchedLocation,
+                child: _FcmSyncWrapper(child: child),
+              ),
             ),
             routes: [
               GoRoute(
@@ -48,11 +53,15 @@ abstract class AppRouter {
               ),
               GoRoute(
                 path: '/zakazlar',
-                builder: (_, __) => const _PlaceholderPage(title: 'Zakazlar'),
+                builder: (c, __) => _PlaceholderPage(
+                  title: AppLocalizations.of(c)!.zakazlar,
+                ),
               ),
               GoRoute(
                 path: '/savat',
-                builder: (_, __) => const _PlaceholderPage(title: 'Savat'),
+                builder: (c, __) => _PlaceholderPage(
+                  title: AppLocalizations.of(c)!.savat,
+                ),
               ),
               GoRoute(
                 path: '/profile',
@@ -129,26 +138,26 @@ class _MainShell extends StatelessWidget {
           selectedFontSize: 11,
           unselectedFontSize: 11,
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.store_outlined),
-              activeIcon: Icon(Icons.store),
-              label: 'DILLER',
+              icon: const Icon(Icons.store_outlined),
+              activeIcon: const Icon(Icons.store),
+              label: AppLocalizations.of(context)!.navDiller,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long_outlined),
-              activeIcon: Icon(Icons.receipt_long),
-              label: 'ZAKAZLAR',
+              icon: const Icon(Icons.receipt_long_outlined),
+              activeIcon: const Icon(Icons.receipt_long),
+              label: AppLocalizations.of(context)!.navZakazlar,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_cart_outlined),
-              activeIcon: Icon(Icons.shopping_cart),
-              label: 'SAVAT',
+              icon: const Icon(Icons.shopping_cart_outlined),
+              activeIcon: const Icon(Icons.shopping_cart),
+              label: AppLocalizations.of(context)!.navSavat,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'PROFIL',
+              icon: const Icon(Icons.person_outline),
+              activeIcon: const Icon(Icons.person),
+              label: AppLocalizations.of(context)!.navProfile,
             ),
           ],
         ),
@@ -159,7 +168,7 @@ class _MainShell extends StatelessWidget {
 
 class _PlaceholderPage extends StatelessWidget {
   const _PlaceholderPage({required this.title});
-  final String title;
+  final String title; // localized from builder
 
   @override
   Widget build(BuildContext context) {
@@ -226,8 +235,8 @@ class _DillerPageState extends State<_DillerPage> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Joylashuvga ruxsat',
+            Text(
+              AppLocalizations.of(ctx)!.locationPermission,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
@@ -236,8 +245,8 @@ class _DillerPageState extends State<_DillerPage> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
-            const Text(
-              'Yaqin dillerlarni topish uchun joylashuvingizga ruxsat bering',
+            Text(
+              AppLocalizations.of(ctx)!.locationDesc,
               style: TextStyle(
                 fontSize: 13,
                 color: Color(0xFF9EA6B3),
@@ -265,7 +274,9 @@ class _DillerPageState extends State<_DillerPage> {
                   }
                 },
                 child: Text(
-                  deniedForever ? 'Sozlamalarga o\'tish' : 'Ruxsat berish',
+                  deniedForever
+                      ? AppLocalizations.of(ctx)!.openSettings
+                      : AppLocalizations.of(ctx)!.grantPermission,
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -276,8 +287,8 @@ class _DillerPageState extends State<_DillerPage> {
             const SizedBox(height: 8),
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text(
-                'Keyinroq',
+              child: Text(
+                AppLocalizations.of(ctx)!.later,
                 style: TextStyle(color: Color(0xFF9EA6B3)),
               ),
             ),
@@ -291,9 +302,9 @@ class _DillerPageState extends State<_DillerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: const Center(
+      body: Center(
         child: Text(
-          'DILLER',
+          AppLocalizations.of(context)!.navDiller,
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w800,

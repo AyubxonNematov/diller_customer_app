@@ -3,21 +3,35 @@ import 'package:equatable/equatable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sement_market_customer/core/api/api_client.dart';
 import 'package:sement_market_customer/core/di/injection.dart';
+import 'package:sement_market_customer/core/firebase/firebase_notifications.dart';
 import 'package:sement_market_customer/core/utils/api_error.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc() : super(AuthInitial()) {
+  AuthBloc() : super(const AuthInitial()) {
+    on<AuthNavigateToPhoneInput>(_onNavigateToPhoneInput);
+    on<AuthNavigateBack>(_onNavigateBack);
     on<AuthSendCode>(_onSendCode);
     on<AuthVerify>(_onVerify);
     on<AuthRegister>(_onRegister);
     on<AuthLogout>(_onLogout);
   }
 
+  void _onNavigateToPhoneInput(
+    AuthNavigateToPhoneInput event,
+    Emitter<AuthState> emit,
+  ) {
+    emit(const AuthShowPhoneInput());
+  }
+
+  void _onNavigateBack(AuthNavigateBack event, Emitter<AuthState> emit) {
+    emit(const AuthInitial());
+  }
+
   Future<void> _onSendCode(AuthSendCode event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
+    emit(const AuthLoading());
     try {
       final api = getIt<ApiClient>();
       final phone = event.phone.replaceAll(RegExp(r'\D'), '');
@@ -29,7 +43,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onVerify(AuthVerify event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
+    emit(const AuthLoading());
     try {
       final api = getIt<ApiClient>();
       final phone = event.phone.replaceAll(RegExp(r'\D'), '');
@@ -54,7 +68,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onRegister(AuthRegister event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
+    emit(const AuthLoading());
     try {
       final api = getIt<ApiClient>();
       final r = await api.dio.post('/auth/register', data: {
@@ -85,12 +99,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       token: token,
       customer: (data['customer'] as Map<String, dynamic>?) ?? {},
     ));
+    FirebaseNotificationsService.sendFcmTokenIfAuthenticated();
   }
 
   Future<void> _onLogout(AuthLogout event, Emitter<AuthState> emit) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
-    emit(AuthInitial());
+    emit(const AuthInitial());
   }
 
   String _parseError(dynamic e) => parseApiError(e);

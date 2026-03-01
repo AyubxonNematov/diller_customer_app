@@ -2,20 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sement_market_customer/core/firebase/firebase_notifications.dart';
 import 'package:sement_market_customer/core/theme/app_theme.dart';
 import 'package:sement_market_customer/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:sement_market_customer/l10n/app_localizations.dart';
 import 'package:smart_auth/smart_auth.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
-
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  bool _showPhoneInput = false;
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +16,16 @@ class _LoginPageState extends State<LoginPage> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthAuthenticated) {
-            FirebaseNotificationsService.sendFcmTokenIfAuthenticated();
             context.go('/profile');
           }
           if (state is AuthError) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(state.message)));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
           }
         },
+        buildWhen: (prev, curr) =>
+            curr is! AuthAuthenticated && curr is! AuthError,
         builder: (context, state) {
           if (state is AuthNeedsRegistration) {
             return _RegisterView(
@@ -46,14 +41,10 @@ class _LoginPageState extends State<LoginPage> {
               child: CircularProgressIndicator(color: AppColors.darkNavy),
             );
           }
-          if (_showPhoneInput) {
-            return _PhoneInputView(
-              onBack: () => setState(() => _showPhoneInput = false),
-            );
+          if (state is AuthShowPhoneInput) {
+            return const _PhoneInputView();
           }
-          return _WelcomeView(
-            onLogin: () => setState(() => _showPhoneInput = true),
-          );
+          return const _WelcomeView();
         },
       ),
     );
@@ -77,8 +68,7 @@ class _LogoWidget extends StatelessWidget {
 // ─── Screen 1: Welcome ───
 
 class _WelcomeView extends StatelessWidget {
-  const _WelcomeView({required this.onLogin});
-  final VoidCallback onLogin;
+  const _WelcomeView();
 
   @override
   Widget build(BuildContext context) {
@@ -91,12 +81,13 @@ class _WelcomeView extends StatelessWidget {
             const _LogoWidget(size: 90),
             const Spacer(flex: 3),
             FilledButton(
-              onPressed: onLogin,
-              child: const Text('KIRISH'),
+              onPressed: () =>
+                  context.read<AuthBloc>().add(const AuthNavigateToPhoneInput()),
+              child: Text(AppLocalizations.of(context)!.login),
             ),
             const SizedBox(height: 24),
             Text(
-              'TEST RAQAM: 99 888 77 66',
+              AppLocalizations.of(context)!.testPhone,
               style: TextStyle(
                 fontSize: 12,
                 color: AppColors.grayText.withValues(alpha: 0.7),
@@ -113,8 +104,7 @@ class _WelcomeView extends StatelessWidget {
 // ─── Screen 2: Phone Input ───
 
 class _PhoneInputView extends StatefulWidget {
-  const _PhoneInputView({required this.onBack});
-  final VoidCallback onBack;
+  const _PhoneInputView();
 
   @override
   State<_PhoneInputView> createState() => _PhoneInputViewState();
@@ -149,23 +139,23 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
             const Spacer(flex: 2),
             const _LogoWidget(size: 80),
             const Spacer(),
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Tizimga kirish',
-                    style: TextStyle(
+                    AppLocalizations.of(context)!.loginTitle,
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                       color: AppColors.darkNavy,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    'TELEFON RAQAMINGIZNI KIRITING',
-                    style: TextStyle(
+                    AppLocalizations.of(context)!.phoneHint,
+                    style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
                       color: AppColors.grayText,
@@ -234,14 +224,15 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
                 backgroundColor:
                     _hasInput ? AppColors.darkNavy : AppColors.graySubtle,
               ),
-              child: const Text('DAVOM ETISH'),
+              child: Text(AppLocalizations.of(context)!.continueBtn),
             ),
             const SizedBox(height: 16),
             GestureDetector(
-              onTap: widget.onBack,
-              child: const Text(
-                'ORQAGA',
-                style: TextStyle(
+              onTap: () =>
+                  context.read<AuthBloc>().add(const AuthNavigateBack()),
+              child: Text(
+                AppLocalizations.of(context)!.back,
+                style: const TextStyle(
                   fontSize: 13,
                   color: AppColors.grayText,
                   fontWeight: FontWeight.w600,
@@ -388,8 +379,8 @@ class _OtpVerifyViewState extends State<_OtpVerifyView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Tasdiqlash',
+                  Text(
+                    AppLocalizations.of(context)!.confirm,
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -398,7 +389,7 @@ class _OtpVerifyViewState extends State<_OtpVerifyView> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '+${widget.phone} RAQAMIGA KOD YUBORILDI',
+                    AppLocalizations.of(context)!.codeSentTo(widget.phone),
                     style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
@@ -461,14 +452,15 @@ class _OtpVerifyViewState extends State<_OtpVerifyView> {
                 backgroundColor:
                     _allFilled ? AppColors.darkNavy : AppColors.graySubtle,
               ),
-              child: const Text('TASDIQLASH'),
+              child: Text(AppLocalizations.of(context)!.verify),
             ),
             const SizedBox(height: 16),
             GestureDetector(
-              onTap: () => context.read<AuthBloc>().add(AuthLogout()),
-              child: const Text(
-                'ORQAGA',
-                style: TextStyle(
+              onTap: () =>
+                  context.read<AuthBloc>().add(const AuthLogout()),
+              child: Text(
+                AppLocalizations.of(context)!.back,
+                style: const TextStyle(
                   fontSize: 13,
                   color: AppColors.grayText,
                   fontWeight: FontWeight.w600,
@@ -577,8 +569,8 @@ class _RegisterViewState extends State<_RegisterView> {
             const SizedBox(height: 40),
             const Center(child: _LogoWidget(size: 70)),
             const SizedBox(height: 32),
-            const Text(
-              'Ro\'yxatdan o\'tish',
+            Text(
+              AppLocalizations.of(context)!.register,
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
@@ -587,7 +579,7 @@ class _RegisterViewState extends State<_RegisterView> {
             ),
             const SizedBox(height: 4),
             Text(
-              '+${widget.phone} RAQAMI UCHUN',
+              AppLocalizations.of(context)!.registerForPhone(widget.phone),
               style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
@@ -596,7 +588,7 @@ class _RegisterViewState extends State<_RegisterView> {
               ),
             ),
             const SizedBox(height: 28),
-            _buildLabel('ISM *'),
+            _buildLabel(AppLocalizations.of(context)!.nameRequired),
             const SizedBox(height: 8),
             _buildField(
               controller: _nameController,
@@ -605,7 +597,7 @@ class _RegisterViewState extends State<_RegisterView> {
               nextFocus: _surnameFocus,
             ),
             const SizedBox(height: 16),
-            _buildLabel('FAMILIYA'),
+            _buildLabel(AppLocalizations.of(context)!.surname),
             const SizedBox(height: 8),
             _buildField(
               controller: _surnameController,
@@ -614,7 +606,7 @@ class _RegisterViewState extends State<_RegisterView> {
               nextFocus: _addressFocus,
             ),
             const SizedBox(height: 16),
-            _buildLabel('MANZIL'),
+            _buildLabel(AppLocalizations.of(context)!.address),
             const SizedBox(height: 8),
             _buildField(
               controller: _addressController,
@@ -631,14 +623,15 @@ class _RegisterViewState extends State<_RegisterView> {
                 backgroundColor:
                     _canSubmit ? AppColors.darkNavy : AppColors.graySubtle,
               ),
-              child: const Text('SAQLASH VA KIRISH'),
+              child: Text(AppLocalizations.of(context)!.saveAndLogin),
             ),
             const SizedBox(height: 16),
             Center(
               child: GestureDetector(
-                onTap: () => context.read<AuthBloc>().add(AuthLogout()),
-                child: const Text(
-                  'ORQAGA',
+                onTap: () =>
+                    context.read<AuthBloc>().add(const AuthLogout()),
+                child: Text(
+                  AppLocalizations.of(context)!.back,
                   style: TextStyle(
                     fontSize: 13,
                     color: AppColors.grayText,
