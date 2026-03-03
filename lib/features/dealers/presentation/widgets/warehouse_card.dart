@@ -6,9 +6,11 @@ class WarehouseCard extends StatelessWidget {
   const WarehouseCard({
     super.key,
     required this.warehouse,
+    this.onTap,
   });
 
   final WarehouseModel warehouse;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -16,23 +18,26 @@ class WarehouseCard extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: Material(
         color: Colors.transparent,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                 children: [
                   Container(
                     width: 40,
@@ -61,9 +66,9 @@ class WarehouseCard extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 12),
-              Row(
+                ),
+                const SizedBox(height: 12),
+                Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(
@@ -85,8 +90,8 @@ class WarehouseCard extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-              if (warehouse.freeDeliveryThreshold != null &&
+                ),
+                if (warehouse.freeDeliveryThreshold != null &&
                   warehouse.freeDeliveryThreshold!.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Container(
@@ -116,8 +121,9 @@ class WarehouseCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

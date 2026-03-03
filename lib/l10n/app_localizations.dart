@@ -493,6 +493,30 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Qidiruvni o\'zgartiring yoki keyinroq urinib ko\'ring'**
   String get warehousesEmptyHint;
+
+  /// No description provided for @productSearchHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mahsulotlarni qidirish...'**
+  String get productSearchHint;
+
+  /// No description provided for @productsEmpty.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mahsulotlar topilmadi'**
+  String get productsEmpty;
+
+  /// No description provided for @productsEmptyHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Qidiruv yoki filterni o\'zgartiring'**
+  String get productsEmptyHint;
+
+  /// No description provided for @filterBrand.
+  ///
+  /// In uz, this message translates to:
+  /// **'Brend'**
+  String get filterBrand;
 }
 
 class _AppLocalizationsDelegate

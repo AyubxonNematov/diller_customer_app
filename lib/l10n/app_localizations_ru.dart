@@ -214,4 +214,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get warehousesEmptyHint => 'Измените поиск или попробуйте позже';
+
+  @override
+  String get productSearchHint => 'Поиск товаров...';
+
+  @override
+  String get productsEmpty => 'Товары не найдены';
+
+  @override
+  String get productsEmptyHint => 'Измените поиск или фильтр';
+
+  @override
+  String get filterBrand => 'Бренд';
 }

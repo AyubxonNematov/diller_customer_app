@@ -64,5 +64,9 @@
   "clearFiltersShowAll": "Очистить фильтр",
   "warehouseSearchHint": "Поиск складов...",
   "warehousesEmpty": "Склады не найдены",
-  "warehousesEmptyHint": "Измените поиск или попробуйте позже"
+  "warehousesEmptyHint": "Измените поиск или попробуйте позже",
+  "productSearchHint": "Поиск товаров...",
+  "productsEmpty": "Товары не найдены",
+  "productsEmptyHint": "Измените поиск или фильтр",
+  "filterBrand": "Бренд"
 }

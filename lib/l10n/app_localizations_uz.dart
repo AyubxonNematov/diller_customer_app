@@ -216,4 +216,16 @@ class AppLocalizationsUz extends AppLocalizations {
   @override
   String get warehousesEmptyHint =>
       'Qidiruvni o\'zgartiring yoki keyinroq urinib ko\'ring';
+
+  @override
+  String get productSearchHint => 'Mahsulotlarni qidirish...';
+
+  @override
+  String get productsEmpty => 'Mahsulotlar topilmadi';
+
+  @override
+  String get productsEmptyHint => 'Qidiruv yoki filterni o\'zgartiring';
+
+  @override
+  String get filterBrand => 'Brend';
 }

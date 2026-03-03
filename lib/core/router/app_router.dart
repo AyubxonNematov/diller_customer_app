@@ -8,10 +8,13 @@ import 'package:sement_market_customer/core/theme/app_theme.dart';
 import 'package:sement_market_customer/l10n/app_localizations.dart';
 import 'package:sement_market_customer/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sement_market_customer/features/dealers/data/models/dealer_model.dart';
+import 'package:sement_market_customer/features/dealers/data/models/warehouse_model.dart';
 import 'package:sement_market_customer/features/dealers/presentation/bloc/dealers_bloc.dart';
+import 'package:sement_market_customer/features/dealers/presentation/bloc/products_bloc.dart';
 import 'package:sement_market_customer/features/dealers/presentation/bloc/warehouses_bloc.dart';
 import 'package:sement_market_customer/features/dealers/presentation/pages/dealer_warehouses_page.dart';
 import 'package:sement_market_customer/features/dealers/presentation/pages/dealers_page.dart';
+import 'package:sement_market_customer/features/dealers/presentation/pages/warehouse_products_page.dart';
 import 'package:sement_market_customer/features/auth/presentation/pages/login_page.dart';
 import 'package:sement_market_customer/features/notifications/presentation/pages/notifications_page.dart';
 import 'package:sement_market_customer/features/profile/presentation/bloc/profile_bloc.dart';
@@ -57,6 +60,25 @@ abstract class AppRouter {
                     routes: [
                       GoRoute(
                         path: ':id',
+                        routes: [
+                          GoRoute(
+                            path: 'w/:warehouseId',
+                            builder: (context, state) {
+                              final warehouse =
+                                  state.extra as WarehouseModel?;
+                              if (warehouse == null) {
+                                return const SizedBox.shrink();
+                              }
+                              return BlocProvider(
+                                create: (_) =>
+                                    ProductsBloc(warehouse: warehouse),
+                                child: WarehouseProductsPage(
+                                  warehouse: warehouse,
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                         builder: (context, state) {
                           final dealer = state.extra as DealerModel?;
                           if (dealer == null) {

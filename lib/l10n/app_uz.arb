@@ -79,5 +79,9 @@
   "clearFiltersShowAll": "Filterni tozalash",
   "warehouseSearchHint": "Omborlarni qidirish...",
   "warehousesEmpty": "Omborlar topilmadi",
-  "warehousesEmptyHint": "Qidiruvni o'zgartiring yoki keyinroq urinib ko'ring"
+  "warehousesEmptyHint": "Qidiruvni o'zgartiring yoki keyinroq urinib ko'ring",
+  "productSearchHint": "Mahsulotlarni qidirish...",
+  "productsEmpty": "Mahsulotlar topilmadi",
+  "productsEmptyHint": "Qidiruv yoki filterni o'zgartiring",
+  "filterBrand": "Brend"
 }
