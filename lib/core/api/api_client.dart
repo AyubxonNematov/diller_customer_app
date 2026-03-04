@@ -41,7 +41,8 @@ class ApiClient {
   late final Dio _dio;
   Dio get dio => _dio;
 
-  static const _defaultBaseUrl = 'http://10.186.139.70:8000/customers/v1';
+  static const _defaultBaseUrl =
+      'https://api-dilller-market-main-slsyhd.laravel.cloud/customers/v1';
 
   static ApiClient create([String? baseUrl]) {
     return ApiClient(baseUrl: baseUrl ?? _defaultBaseUrl);
