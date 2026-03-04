@@ -25,6 +25,7 @@ dependencies:
   alice: ^1.0.0
   alice_dio: ^1.0.7
   smart_auth: ^3.2.0
+  flutter_native_splash: ^2.4.7
 
 dev_dependencies:
   flutter_test:
@@ -41,7 +42,14 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/launcher_icon.png"
+  image_path: "assets/diller_logo.png"
   adaptive_icon_background: "#F5BF1A"
-  adaptive_icon_foreground: "assets/launcher_icon_fg.png"
+  adaptive_icon_foreground: "assets/diller_logo.png"
   min_sdk_android: 21
+
+flutter_native_splash:
+  color: "#ffffff" # Orqa fon rangi (masalan, oq)
+  image: assets/diller_logo.png # Siz qo'ymoqchi bo'lgan rasm yo'li
+  android_12:
+    image: assets/diller_logo.png # Android 12+ uchun rasm
+    color: "#ffffff"
