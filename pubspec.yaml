@@ -42,14 +42,14 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/diller_logo.png"
+  image_path: "assets/flutter_launcher_icon.png"
   adaptive_icon_background: "#F5BF1A"
-  adaptive_icon_foreground: "assets/diller_logo.png"
+  adaptive_icon_foreground: "assets/flutter_launcher_icon.png"
   min_sdk_android: 21
 
 flutter_native_splash:
   color: "#ffffff" # Orqa fon rangi (masalan, oq)
-  image: assets/diller_logo.png # Siz qo'ymoqchi bo'lgan rasm yo'li
+  image: assets/flutter_native_splash.png # Siz qo'ymoqchi bo'lgan rasm yo'li
   android_12:
-    image: assets/diller_logo.png # Android 12+ uchun rasm
+    image: assets/flutter_native_splash.png # Android 12+ uchun rasm
     color: "#ffffff"
