@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:sement_market_customer/core/di/injection.dart';
 import 'package:sement_market_customer/core/utils/api_error.dart';
+import 'package:sement_market_customer/core/utils/location_helper.dart';
 import 'package:sement_market_customer/features/dealers/data/dealers_api.dart';
 import 'package:sement_market_customer/features/dealers/data/models/dealer_model.dart';
 import 'package:sement_market_customer/features/dealers/data/models/paginated_dealers_response.dart';
@@ -20,11 +20,12 @@ class WarehousesBloc extends Bloc<WarehousesEvent, WarehousesState> {
     DealersApi? api,
   })  : _dealer = dealer,
         _api = api ?? getIt<DealersApi>(),
-        super(const WarehousesInitial()) {
+        super(const WarehousesLoading()) {
     on<WarehousesLoad>(_onLoad);
     on<WarehousesSearchChanged>(_onSearchChanged);
     on<WarehousesSearchApply>(_onSearchApply);
     on<WarehousesLoadMore>(_onLoadMore);
+    add(const WarehousesLoad());
   }
 
   final DealerModel _dealer;
@@ -42,25 +43,6 @@ class WarehousesBloc extends Bloc<WarehousesEvent, WarehousesState> {
     return super.close();
   }
 
-  Future<void> _initLocation() async {
-    try {
-      final status = await Geolocator.checkPermission();
-      if (status == LocationPermission.denied ||
-          status == LocationPermission.deniedForever ||
-          status == LocationPermission.unableToDetermine) {
-        return;
-      }
-      final pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.medium,
-        ),
-      );
-      _location = '${pos.latitude},${pos.longitude}';
-    } catch (_) {
-      _location = null;
-    }
-  }
-
   Future<void> _onLoad(
     WarehousesLoad event,
     Emitter<WarehousesState> emit,
@@ -70,7 +52,15 @@ class WarehousesBloc extends Bloc<WarehousesEvent, WarehousesState> {
     } else {
       emit(const WarehousesLoading());
     }
-    await _initLocation();
+
+    // Don't wait for location to start loading data.
+    // If we have it cached, use it. Otherwise, fetch it in background for next refresh/page.
+    if (_location == null) {
+      unawaited(LocationHelper.getCurrentLocation().then((loc) {
+        if (loc != null) _location = loc;
+      }));
+    }
+
     await _loadWarehouses(emit);
   }
 
@@ -122,8 +112,6 @@ class WarehousesBloc extends Bloc<WarehousesEvent, WarehousesState> {
     WarehousesSearchApply event,
     Emitter<WarehousesState> emit,
   ) async {
-    if (state is! WarehousesLoaded) return;
-    final s = state as WarehousesLoaded;
     await _loadWarehouses(emit, search: event.query);
   }
 

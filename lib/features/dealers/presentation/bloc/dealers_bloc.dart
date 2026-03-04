@@ -42,7 +42,13 @@ class DealersBloc extends Bloc<DealersEvent, DealersState> {
     } else {
       emit(const DealersLoading());
     }
-    _location ??= await LocationHelper.getCurrentLocation();
+
+    if (_location == null) {
+      unawaited(LocationHelper.getCurrentLocation().then((loc) {
+        if (loc != null) _location = loc;
+      }));
+    }
+
     await _loadDealers(emit);
   }
 

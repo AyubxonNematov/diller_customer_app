@@ -7,10 +7,6 @@ sealed class DealersState extends Equatable {
   List<Object?> get props => [];
 }
 
-final class DealersInitial extends DealersState {
-  const DealersInitial();
-}
-
 final class DealersLoading extends DealersState {
   const DealersLoading();
 }

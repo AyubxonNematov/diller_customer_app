@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sement_market_customer/core/di/injection.dart';
 import 'package:sement_market_customer/core/theme/app_theme.dart';
-import 'package:sement_market_customer/features/dealers/data/dealers_api.dart';
+import 'package:sement_market_customer/core/api/catalog_api.dart';
 import 'package:sement_market_customer/features/dealers/data/models/brand_model.dart';
 import 'package:sement_market_customer/features/dealers/data/models/warehouse_model.dart';
 import 'package:sement_market_customer/l10n/app_localizations.dart';
@@ -43,7 +43,7 @@ class ProductsFilterModal extends StatefulWidget {
 }
 
 class _ProductsFilterModalState extends State<ProductsFilterModal> {
-  final DealersApi _api = getIt<DealersApi>();
+  final CatalogApi _api = getIt<CatalogApi>();
 
   List<BrandModel> _brands = [];
   bool _loading = true;

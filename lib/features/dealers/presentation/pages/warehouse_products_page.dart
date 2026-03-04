@@ -10,6 +10,8 @@ import 'package:sement_market_customer/features/dealers/presentation/widgets/dea
 import 'package:sement_market_customer/features/dealers/presentation/widgets/product_card.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/products_filter_modal.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/products_search_bar.dart';
+import 'package:sement_market_customer/core/widgets/detail_page_header.dart';
+import 'package:sement_market_customer/core/widgets/refreshing_overlay.dart';
 
 class WarehouseProductsPage extends StatefulWidget {
   const WarehouseProductsPage({
@@ -29,9 +31,6 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ProductsBloc>().add(const ProductsLoad());
-    });
   }
 
   @override
@@ -65,8 +64,9 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
       backgroundColor: AppColors.background,
       body: Column(
         children: [
-          _WarehouseHeader(
-            warehouse: widget.warehouse,
+          DetailPageHeader(
+            title: widget.warehouse.name,
+            subtitle: widget.warehouse.address,
             onBack: () => context.pop(),
           ),
           BlocBuilder<ProductsBloc, ProductsState>(
@@ -173,46 +173,10 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
                           },
                         ),
                       ),
-                      if (state.isRefreshing)
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          child: Material(
-                            elevation: 0,
-                            color: Colors.white.withValues(alpha: 0.8),
-                            child: SafeArea(
-                              bottom: false,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: AppColors.darkNavy,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      AppLocalizations.of(context)!
-                                          .dealersLoading,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: AppColors.grayText,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                      RefreshingOverlay(
+                        isRefreshing: state.isRefreshing,
+                        message: AppLocalizations.of(context)!.dealersLoading,
+                      ),
                     ],
                   );
                 }
@@ -240,75 +204,6 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
   }
 }
 
-class _WarehouseHeader extends StatelessWidget {
-  const _WarehouseHeader({
-    required this.warehouse,
-    required this.onBack,
-  });
-
-  final WarehouseModel warehouse;
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.darkNavy,
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top,
-        left: 4,
-        right: 16,
-        bottom: 14,
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: Colors.white,
-                size: 22,
-              ),
-              onPressed: onBack,
-              style: IconButton.styleFrom(
-                minimumSize: const Size(48, 48),
-              ),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    warehouse.name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    warehouse.address,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.75),
-                      fontSize: 12,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _ProductCardSkeleton extends StatelessWidget {
   @override

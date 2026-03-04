@@ -7,10 +7,6 @@ sealed class ProductsState extends Equatable {
   List<Object?> get props => [];
 }
 
-final class ProductsInitial extends ProductsState {
-  const ProductsInitial();
-}
-
 final class ProductsLoading extends ProductsState {
   const ProductsLoading();
 }

@@ -9,6 +9,8 @@ import 'package:sement_market_customer/features/dealers/presentation/widgets/dea
 import 'package:sement_market_customer/features/dealers/presentation/widgets/dealers_error_state.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/warehouse_card.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/warehouses_search_bar.dart';
+import 'package:sement_market_customer/core/widgets/detail_page_header.dart';
+import 'package:sement_market_customer/core/widgets/refreshing_overlay.dart';
 
 class DealerWarehousesPage extends StatefulWidget {
   const DealerWarehousesPage({
@@ -28,9 +30,6 @@ class _DealerWarehousesPageState extends State<DealerWarehousesPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<WarehousesBloc>().add(const WarehousesLoad());
-    });
   }
 
   @override
@@ -49,8 +48,9 @@ class _DealerWarehousesPageState extends State<DealerWarehousesPage> {
       backgroundColor: AppColors.background,
       body: Column(
         children: [
-          _DealerHeader(
-            dealer: widget.dealer,
+          DetailPageHeader(
+            title: widget.dealer.name,
+            subtitle: widget.dealer.address,
             onBack: () => Navigator.of(context).pop(),
           ),
           BlocBuilder<WarehousesBloc, WarehousesState>(
@@ -149,46 +149,10 @@ class _DealerWarehousesPageState extends State<DealerWarehousesPage> {
                           },
                         ),
                       ),
-                      if (state.isRefreshing)
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          child: Material(
-                            elevation: 0,
-                            color: Colors.white.withValues(alpha: 0.8),
-                            child: SafeArea(
-                              bottom: false,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: AppColors.darkNavy,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      AppLocalizations.of(context)!
-                                          .dealersLoading,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: AppColors.grayText,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                      RefreshingOverlay(
+                        isRefreshing: state.isRefreshing,
+                        message: AppLocalizations.of(context)!.dealersLoading,
+                      ),
                     ],
                   );
                 }
@@ -210,78 +174,6 @@ class _DealerWarehousesPageState extends State<DealerWarehousesPage> {
   }
 }
 
-class _DealerHeader extends StatelessWidget {
-  const _DealerHeader({
-    required this.dealer,
-    required this.onBack,
-  });
-
-  final DealerModel dealer;
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.darkNavy,
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top,
-        left: 4,
-        right: 16,
-        bottom: 14,
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: Colors.white,
-                size: 22,
-              ),
-              onPressed: onBack,
-              style: IconButton.styleFrom(
-                minimumSize: const Size(48, 48),
-              ),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    dealer.name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (dealer.address != null &&
-                      dealer.address!.isNotEmpty) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      dealer.address!,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.75),
-                        fontSize: 12,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _WarehouseCardSkeleton extends StatelessWidget {
   @override

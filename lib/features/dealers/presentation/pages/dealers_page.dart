@@ -11,6 +11,8 @@ import 'package:sement_market_customer/features/dealers/presentation/widgets/dea
 import 'package:sement_market_customer/features/dealers/presentation/widgets/dealers_empty_state.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/dealers_error_state.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/dealers_filter_modal.dart';
+import 'package:sement_market_customer/core/utils/location_helper.dart';
+import 'package:sement_market_customer/core/widgets/refreshing_overlay.dart';
 
 class DealersPage extends StatefulWidget {
   const DealersPage({super.key});
@@ -27,7 +29,6 @@ class _DealersPageState extends State<DealersPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkLocation();
-      context.read<DealersBloc>().add(const DealersLoad());
     });
   }
 
@@ -39,7 +40,7 @@ class _DealersPageState extends State<DealersPage> {
 
   Future<void> _checkLocation() async {
     if (!mounted) return;
-    final status = await Geolocator.checkPermission();
+    final status = await LocationHelper.checkPermission();
     if (!mounted) return;
     if (status == LocationPermission.denied ||
         status == LocationPermission.unableToDetermine) {
@@ -264,46 +265,10 @@ class _DealersPageState extends State<DealersPage> {
                           },
                         ),
                       ),
-                      if (state.isRefreshing)
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          child: Material(
-                            elevation: 0,
-                            color: Colors.white.withValues(alpha: 0.8),
-                            child: SafeArea(
-                              bottom: false,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: AppColors.darkNavy,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      AppLocalizations.of(context)!
-                                          .dealersLoading,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: AppColors.grayText,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                      RefreshingOverlay(
+                        isRefreshing: state.isRefreshing,
+                        message: AppLocalizations.of(context)!.dealersLoading,
+                      ),
                     ],
                   );
                 }

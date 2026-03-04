@@ -4,10 +4,10 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sement_market_customer/core/di/injection.dart';
 import 'package:sement_market_customer/core/utils/api_error.dart';
-import 'package:sement_market_customer/features/dealers/data/dealers_api.dart';
 import 'package:sement_market_customer/features/dealers/data/models/paginated_dealers_response.dart';
 import 'package:sement_market_customer/features/dealers/data/models/product_model.dart';
 import 'package:sement_market_customer/features/dealers/data/models/warehouse_model.dart';
+import 'package:sement_market_customer/features/dealers/data/products_api.dart';
 
 part 'products_event.dart';
 part 'products_state.dart';
@@ -16,19 +16,20 @@ part 'products_state.dart';
 class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
   ProductsBloc({
     required WarehouseModel warehouse,
-    DealersApi? api,
+    ProductsApi? api,
   })  : _warehouse = warehouse,
-        _api = api ?? getIt<DealersApi>(),
-        super(const ProductsInitial()) {
+        _api = api ?? getIt<ProductsApi>(),
+        super(const ProductsLoading()) {
     on<ProductsLoad>(_onLoad);
     on<ProductsSearchChanged>(_onSearchChanged);
     on<ProductsSearchApply>(_onSearchApply);
     on<ProductsFiltersApplied>(_onFiltersApplied);
     on<ProductsLoadMore>(_onLoadMore);
+    add(const ProductsLoad());
   }
 
   final WarehouseModel _warehouse;
-  final DealersApi _api;
+  final ProductsApi _api;
   Timer? _searchDebounce;
 
   static const _searchDebounceDuration = Duration(milliseconds: 400);
