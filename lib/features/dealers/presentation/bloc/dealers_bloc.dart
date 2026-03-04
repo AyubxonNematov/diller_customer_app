@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:sement_market_customer/core/di/injection.dart';
 import 'package:sement_market_customer/core/utils/api_error.dart';
+import 'package:sement_market_customer/core/utils/location_helper.dart';
 import 'package:sement_market_customer/features/dealers/data/dealers_api.dart';
 import 'package:sement_market_customer/features/dealers/data/models/dealer_model.dart';
 import 'package:sement_market_customer/features/dealers/data/models/paginated_dealers_response.dart';
@@ -12,18 +12,19 @@ import 'package:sement_market_customer/features/dealers/data/models/paginated_de
 part 'dealers_event.dart';
 part 'dealers_state.dart';
 
-/// Bloc for dealers list with search, filters (category, region), pagination and geolocation.
 class DealersBloc extends Bloc<DealersEvent, DealersState> {
-  DealersBloc({DealersApi? api}) : super(const DealersInitial()) {
-    _api = api ?? getIt<DealersApi>();
+  DealersBloc({DealersApi? api})
+      : _api = api ?? getIt<DealersApi>(),
+        super(const DealersLoading()) {
     on<DealersLoad>(_onLoad);
     on<DealersSearchChanged>(_onSearchChanged);
     on<DealersSearchApply>(_onSearchApply);
     on<DealersFiltersApplied>(_onFiltersApplied);
     on<DealersLoadMore>(_onLoadMore);
+    add(const DealersLoad());
   }
 
-  late final DealersApi _api;
+  final DealersApi _api;
   String? _location;
   Timer? _searchDebounce;
 
@@ -41,27 +42,8 @@ class DealersBloc extends Bloc<DealersEvent, DealersState> {
     } else {
       emit(const DealersLoading());
     }
-    await _initLocation();
+    _location ??= await LocationHelper.getCurrentLocation();
     await _loadDealers(emit);
-  }
-
-  Future<void> _initLocation() async {
-    try {
-      final status = await Geolocator.checkPermission();
-      if (status == LocationPermission.denied ||
-          status == LocationPermission.deniedForever ||
-          status == LocationPermission.unableToDetermine) {
-        return;
-      }
-      final pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.medium,
-        ),
-      );
-      _location = '${pos.latitude},${pos.longitude}';
-    } catch (_) {
-      _location = null;
-    }
   }
 
   Future<void> _loadDealers(
@@ -100,8 +82,6 @@ class DealersBloc extends Bloc<DealersEvent, DealersState> {
         searchQuery: search ?? prev?.searchQuery ?? '',
         location: _location,
         meta: dealersRes.meta,
-        isRefreshing: false,
-        isLoadingMore: false,
       ));
     } catch (e) {
       emit(DealersError(parseApiError(e)));
@@ -147,7 +127,6 @@ class DealersBloc extends Bloc<DealersEvent, DealersState> {
     );
   }
 
-  /// RefreshIndicator uchun: yangilash tugaguncha kutadi.
   Future<void> refresh() async {
     final completer = Completer<void>();
     final sub = stream

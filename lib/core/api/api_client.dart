@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:get_it/get_it.dart';
 import 'package:sement_market_customer/core/debug/alice_setup.dart';
+import 'package:sement_market_customer/core/locale/app_locale.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiClient {
@@ -11,11 +13,16 @@ class ApiClient {
       receiveTimeout: const Duration(seconds: 30),
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
     ));
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
+        // Dynamically set Accept-Language from current app locale
+        if (GetIt.instance.isRegistered<AppLocale>()) {
+          final appLocale = GetIt.instance<AppLocale>();
+          options.headers['Accept-Language'] = appLocale.locale.languageCode;
+        }
         final prefs = await SharedPreferences.getInstance();
         final token = prefs.getString('auth_token');
         if (token != null) {

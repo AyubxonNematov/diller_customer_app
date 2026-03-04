@@ -21,9 +21,7 @@ import 'package:sement_market_customer/features/profile/presentation/bloc/profil
 import 'package:sement_market_customer/features/profile/presentation/pages/profile_page.dart';
 
 abstract class AppRouter {
-  static List<BlocProvider> get providers => [
-        BlocProvider(create: (_) => AuthBloc()),
-      ];
+  static List<BlocProvider> get providers => [];
 
   static GoRouter get router => GoRouter(
         navigatorKey: navigatorKey,
