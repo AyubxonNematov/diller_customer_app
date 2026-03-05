@@ -15,13 +15,15 @@ import 'package:sement_market_customer/features/dealers/presentation/bloc/wareho
 import 'package:sement_market_customer/features/dealers/presentation/pages/dealer_warehouses_page.dart';
 import 'package:sement_market_customer/features/dealers/presentation/pages/dealers_page.dart';
 import 'package:sement_market_customer/features/dealers/presentation/pages/warehouse_products_page.dart';
+import 'package:sement_market_customer/features/dealers/presentation/pages/cart_page.dart';
+import 'package:sement_market_customer/features/dealers/presentation/bloc/cart_bloc.dart';
 import 'package:sement_market_customer/features/auth/presentation/pages/login_page.dart';
 import 'package:sement_market_customer/features/notifications/presentation/pages/notifications_page.dart';
 import 'package:sement_market_customer/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:sement_market_customer/features/profile/presentation/pages/profile_page.dart';
 
 abstract class AppRouter {
-  static GoRouter get router => GoRouter(
+  static final router = GoRouter(
         navigatorKey: navigatorKey,
         initialLocation: '/login',
         redirect: (context, state) async {
@@ -108,9 +110,7 @@ abstract class AppRouter {
                 routes: [
                   GoRoute(
                     path: '/savat',
-                    builder: (c, __) => _PlaceholderPage(
-                      title: AppLocalizations.of(c)!.savat,
-                    ),
+                    builder: (c, __) => const CartPage(),
                   ),
                 ],
               ),
@@ -193,11 +193,27 @@ class _MainShell extends StatelessWidget {
               activeIcon: const Icon(Icons.receipt_long),
               label: AppLocalizations.of(context)!.navZakazlar,
             ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.shopping_cart_outlined),
-              activeIcon: const Icon(Icons.shopping_cart),
-              label: AppLocalizations.of(context)!.navSavat,
-            ),
+              BottomNavigationBarItem(
+                icon: BlocBuilder<CartBloc, CartState>(
+                  builder: (context, state) {
+                    return Badge(
+                      label: Text(state.items.length.toString()),
+                      isLabelVisible: state.items.isNotEmpty,
+                      child: const Icon(Icons.shopping_cart_outlined),
+                    );
+                  },
+                ),
+                activeIcon: BlocBuilder<CartBloc, CartState>(
+                  builder: (context, state) {
+                    return Badge(
+                      label: Text(state.items.length.toString()),
+                      isLabelVisible: state.items.isNotEmpty,
+                      child: const Icon(Icons.shopping_cart),
+                    );
+                  },
+                ),
+                label: AppLocalizations.of(context)!.navSavat,
+              ),
             BottomNavigationBarItem(
               icon: const Icon(Icons.person_outline),
               activeIcon: const Icon(Icons.person),

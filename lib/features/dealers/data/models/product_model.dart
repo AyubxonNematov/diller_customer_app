@@ -68,6 +68,22 @@ class ProductModel extends Equatable {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'warehouse_id': warehouseId,
+      'brand_id': brandId,
+      'unit_id': unitId,
+      'name': name,
+      'price': price,
+      'earnings_per_unit': earningsPerUnit,
+      'images': images,
+      'description': description,
+      'brand_name': brandName,
+      'unit_name': unitName,
+    };
+  }
+
   static String _parseTranslatable(dynamic value) {
     if (value == null) return '';
     if (value is String) return value;

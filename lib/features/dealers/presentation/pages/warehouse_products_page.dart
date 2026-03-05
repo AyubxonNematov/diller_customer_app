@@ -5,11 +5,15 @@ import 'package:sement_market_customer/core/theme/app_theme.dart';
 import 'package:sement_market_customer/l10n/app_localizations.dart';
 import 'package:sement_market_customer/features/dealers/data/models/warehouse_model.dart';
 import 'package:sement_market_customer/features/dealers/presentation/bloc/products_bloc.dart';
-import 'package:sement_market_customer/features/dealers/presentation/widgets/dealers_empty_state.dart';
-import 'package:sement_market_customer/features/dealers/presentation/widgets/dealers_error_state.dart';
-import 'package:sement_market_customer/features/dealers/presentation/widgets/product_card.dart';
-import 'package:sement_market_customer/features/dealers/presentation/widgets/products_filter_modal.dart';
-import 'package:sement_market_customer/features/dealers/presentation/widgets/products_search_bar.dart';
+import 'package:sement_market_customer/features/dealers/presentation/widgets/Dealers/dealers_empty_state.dart';
+import 'package:sement_market_customer/features/dealers/presentation/widgets/Dealers/dealers_error_state.dart';
+import 'package:sement_market_customer/features/dealers/data/models/product_model.dart';
+import 'package:sement_market_customer/features/dealers/data/models/cart_item_model.dart';
+import 'package:sement_market_customer/features/dealers/presentation/bloc/cart_bloc.dart';
+import 'package:sement_market_customer/features/dealers/presentation/widgets/Products/product_card.dart';
+import 'package:sement_market_customer/features/dealers/presentation/widgets/Products/products_filter_modal.dart';
+import 'package:sement_market_customer/features/dealers/presentation/widgets/Products/products_search_bar.dart';
+import 'package:sement_market_customer/features/dealers/presentation/widgets/Products/quantity_selection_bottom_sheet.dart';
 import 'package:sement_market_customer/core/widgets/detail_page_header.dart';
 import 'package:sement_market_customer/core/widgets/refreshing_overlay.dart';
 
@@ -127,7 +131,7 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
                       RefreshIndicator(
                         onRefresh: _onRefresh,
                         color: AppColors.darkNavy,
-                        child: GridView.builder(
+                        child: ListView.separated(
                           controller: _scrollController,
                           padding: EdgeInsets.only(
                             left: 16,
@@ -137,13 +141,7 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
                                 (state.hasMore ? 60 : 0) +
                                 MediaQuery.of(context).padding.bottom,
                           ),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 0.72,
-                          ),
+                          separatorBuilder: (_, __) => const SizedBox(height: 12),
                           itemCount:
                               state.products.length + (state.hasMore ? 1 : 0),
                           itemBuilder: (context, index) {
@@ -169,6 +167,7 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
                             return ProductCard(
                               key: ValueKey(state.products[index].id),
                               product: state.products[index],
+                              onTap: () => _showQuantitySheet(state.products[index]),
                             );
                           },
                         ),
@@ -187,6 +186,93 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
         ],
       ),
     );
+  }
+
+  void _showQuantitySheet(ProductModel product) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => QuantitySelectionBottomSheet(
+        product: product,
+        onConfirm: (quantity) {
+          context.read<CartBloc>().add(
+                AddToCart(
+                  CartItemModel(
+                    product: product,
+                    quantity: quantity,
+                    warehouseId: widget.warehouse.id,
+                    warehouseName: widget.warehouse.name,
+                  ),
+                ),
+              );
+          Navigator.pop(context);
+          _showSuccessOverlay(product, quantity);
+        },
+      ),
+    );
+  }
+
+  void _showSuccessOverlay(ProductModel product, int quantity) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 10,
+        left: 10,
+        right: 10,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF2E7D32),
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Color(0x33FFFFFF),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.check, color: Colors.white, size: 32),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'SAVATGA QO\'SHILDI',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                Text(
+                  '$quantity ${product.unitName ?? 'qop'} ${product.name}',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+    Future.delayed(const Duration(seconds: 2), () => overlayEntry.remove());
   }
 
   Widget _buildSkeleton() {

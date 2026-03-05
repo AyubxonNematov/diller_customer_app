@@ -5,10 +5,10 @@ import 'package:sement_market_customer/core/theme/app_theme.dart';
 import 'package:sement_market_customer/l10n/app_localizations.dart';
 import 'package:sement_market_customer/features/dealers/data/models/dealer_model.dart';
 import 'package:sement_market_customer/features/dealers/presentation/bloc/warehouses_bloc.dart';
-import 'package:sement_market_customer/features/dealers/presentation/widgets/dealers_empty_state.dart';
-import 'package:sement_market_customer/features/dealers/presentation/widgets/dealers_error_state.dart';
-import 'package:sement_market_customer/features/dealers/presentation/widgets/warehouse_card.dart';
-import 'package:sement_market_customer/features/dealers/presentation/widgets/warehouses_search_bar.dart';
+import 'package:sement_market_customer/features/dealers/presentation/widgets/Dealers/dealers_empty_state.dart';
+import 'package:sement_market_customer/features/dealers/presentation/widgets/Dealers/dealers_error_state.dart';
+import 'package:sement_market_customer/features/dealers/presentation/widgets/Warehouses/warehouse_card.dart';
+import 'package:sement_market_customer/features/dealers/presentation/widgets/Warehouses/warehouses_search_bar.dart';
 import 'package:sement_market_customer/core/widgets/detail_page_header.dart';
 import 'package:sement_market_customer/core/widgets/refreshing_overlay.dart';
 
