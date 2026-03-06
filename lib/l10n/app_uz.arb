@@ -69,7 +69,6 @@
   "dealersEmptyHint": "Boshqa kategoriya yoki qidiruvni sinab ko'ring",
   "dealersError": "Xatolik yuz berdi",
   "dealersErrorHint": "Internet aloqasini tekshiring",
-  "dealersLoading": "Yuklanmoqda...",
   "filter": "Filter",
   "filterCategory": "Kategoriya",
   "filterRegion": "Hudud",

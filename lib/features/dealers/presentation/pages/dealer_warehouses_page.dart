@@ -8,9 +8,10 @@ import 'package:sement_market_customer/features/dealers/presentation/bloc/wareho
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Dealers/dealers_empty_state.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Dealers/dealers_error_state.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Warehouses/warehouse_card.dart';
+import 'package:sement_market_customer/features/dealers/presentation/widgets/Warehouses/warehouse_card_skeleton.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Warehouses/warehouses_search_bar.dart';
 import 'package:sement_market_customer/core/widgets/detail_page_header.dart';
-import 'package:sement_market_customer/core/widgets/refreshing_overlay.dart';
+import 'package:sement_market_customer/core/widgets/detail_page_header.dart';
 
 class DealerWarehousesPage extends StatefulWidget {
   const DealerWarehousesPage({
@@ -86,7 +87,10 @@ class _DealerWarehousesPageState extends State<DealerWarehousesPage> {
                   );
                 }
                 if (state is WarehousesLoaded) {
-                  if (state.warehouses.isEmpty && !state.isRefreshing) {
+                  if (state.isRefreshing) {
+                    return _buildSkeleton();
+                  }
+                  if (state.warehouses.isEmpty) {
                     return DealersEmptyState(
                       emptyTitle:
                           AppLocalizations.of(context)!.warehousesEmpty,
@@ -97,63 +101,55 @@ class _DealerWarehousesPageState extends State<DealerWarehousesPage> {
                           .add(const WarehousesLoad()),
                     );
                   }
-                  return Stack(
-                    children: [
-                      RefreshIndicator(
-                        onRefresh: _onRefresh,
-                        color: AppColors.darkNavy,
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          padding: EdgeInsets.only(
-                            left: 16,
-                            right: 16,
-                            top: 8,
-                            bottom: 16 +
-                                (state.hasMore ? 60 : 0) +
-                                MediaQuery.of(context).padding.bottom,
-                          ),
-                          itemCount:
-                              state.warehouses.length + (state.hasMore ? 1 : 0),
-                          itemBuilder: (context, index) {
-                            if (index >= state.warehouses.length) {
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                context
-                                    .read<WarehousesBloc>()
-                                    .add(const WarehousesLoadMore());
-                              });
-                              return state.isLoadingMore
-                                  ? const Padding(
-                                      padding: EdgeInsets.all(16),
-                                      child: Center(
-                                        child: SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: AppColors.darkNavy,
-                                          ),
-                                        ),
+                  return RefreshIndicator(
+                    onRefresh: _onRefresh,
+                    color: AppColors.darkNavy,
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      padding: EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 8,
+                        bottom: 16 +
+                            (state.hasMore ? 60 : 0) +
+                            MediaQuery.of(context).padding.bottom,
+                      ),
+                      itemCount:
+                          state.warehouses.length + (state.hasMore ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index >= state.warehouses.length) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            context
+                                .read<WarehousesBloc>()
+                                .add(const WarehousesLoadMore());
+                          });
+                          return state.isLoadingMore
+                              ? const Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Center(
+                                    child: SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.darkNavy,
                                       ),
-                                    )
-                                  : const SizedBox.shrink();
-                            }
-                        final warehouse = state.warehouses[index];
-                        return WarehouseCard(
-                          key: ValueKey(warehouse.id),
-                          warehouse: warehouse,
-                          onTap: () => context.push(
-                            '/diller/${widget.dealer.id}/w/${warehouse.id}',
-                            extra: warehouse,
-                          ),
-                        );
-                          },
-                        ),
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink();
+                        }
+                    final warehouse = state.warehouses[index];
+                    return WarehouseCard(
+                      key: ValueKey(warehouse.id),
+                      warehouse: warehouse,
+                      onTap: () => context.push(
+                        '/diller/${widget.dealer.id}/w/${warehouse.id}',
+                        extra: warehouse,
                       ),
-                      RefreshingOverlay(
-                        isRefreshing: state.isRefreshing,
-                        message: AppLocalizations.of(context)!.dealersLoading,
-                      ),
-                    ],
+                    );
+                      },
+                    ),
                   );
                 }
                 return const SizedBox.shrink();
@@ -169,73 +165,7 @@ class _DealerWarehousesPageState extends State<DealerWarehousesPage> {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       itemCount: 5,
-      itemBuilder: (_, __) => _WarehouseCardSkeleton(),
-    );
-  }
-}
-
-
-class _WarehouseCardSkeleton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.graySubtle.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 14,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: AppColors.graySubtle.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        height: 12,
-                        width: 120,
-                        decoration: BoxDecoration(
-                          color: AppColors.graySubtle.withValues(alpha: 0.4),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+      itemBuilder: (_, __) => const WarehouseCardSkeleton(),
     );
   }
 }

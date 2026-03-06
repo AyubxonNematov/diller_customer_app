@@ -184,9 +184,6 @@ class AppLocalizationsUz extends AppLocalizations {
   String get dealersErrorHint => 'Internet aloqasini tekshiring';
 
   @override
-  String get dealersLoading => 'Yuklanmoqda...';
-
-  @override
   String get filter => 'Filter';
 
   @override

@@ -12,7 +12,7 @@ import 'package:sement_market_customer/features/dealers/presentation/widgets/Dea
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Dealers/dealers_error_state.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Dealers/dealers_filter_modal.dart';
 import 'package:sement_market_customer/core/utils/location_helper.dart';
-import 'package:sement_market_customer/core/widgets/refreshing_overlay.dart';
+import 'package:sement_market_customer/core/utils/location_helper.dart';
 
 class DealersPage extends StatefulWidget {
   const DealersPage({super.key});
@@ -198,7 +198,10 @@ class _DealersPageState extends State<DealersPage> {
                   );
                 }
                 if (state is DealersLoaded) {
-                  if (state.dealers.isEmpty && !state.isRefreshing) {
+                  if (state.isRefreshing) {
+                    return _buildSkeletonLoading();
+                  }
+                  if (state.dealers.isEmpty) {
                     return DealersEmptyState(
                       hasActiveFilters: state.activeFiltersCount > 0,
                       onRetry: () =>
@@ -211,65 +214,57 @@ class _DealersPageState extends State<DealersPage> {
                           ),
                     );
                   }
-                  return Stack(
-                    children: [
-                      RefreshIndicator(
-                        onRefresh: _onRefresh,
-                        color: AppColors.darkNavy,
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          padding: EdgeInsets.only(
-                            left: 16,
-                            right: 16,
-                            top: 12,
-                            bottom: 16 +
-                                (state.hasMore ? 60 : 0) +
-                                MediaQuery.of(context).padding.bottom,
-                          ),
-                          itemCount:
-                              state.dealers.length + (state.hasMore ? 1 : 0),
-                          itemBuilder: (context, index) {
-                            if (index >= state.dealers.length) {
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                context
-                                    .read<DealersBloc>()
-                                    .add(const DealersLoadMore());
-                              });
-                              return state.isLoadingMore
-                                  ? const Padding(
-                                      padding: EdgeInsets.all(16),
-                                      child: Center(
-                                        child: SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: AppColors.darkNavy,
-                                          ),
-                                        ),
+                  return RefreshIndicator(
+                    onRefresh: _onRefresh,
+                    color: AppColors.darkNavy,
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      padding: EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 12,
+                        bottom: 16 +
+                            (state.hasMore ? 60 : 0) +
+                            MediaQuery.of(context).padding.bottom,
+                      ),
+                      itemCount:
+                          state.dealers.length + (state.hasMore ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index >= state.dealers.length) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            context
+                                .read<DealersBloc>()
+                                .add(const DealersLoadMore());
+                          });
+                          return state.isLoadingMore
+                              ? const Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Center(
+                                    child: SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.darkNavy,
                                       ),
-                                    )
-                                  : const SizedBox.shrink();
-                            }
-                            final dealer = state.dealers[index];
-                            return DealerCard(
-                              key: ValueKey(dealer.id),
-                              dealer: dealer,
-                              onTap: () {
-                                context.push(
-                                  '/diller/${dealer.id}',
-                                  extra: dealer,
-                                );
-                              },
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink();
+                        }
+                        final dealer = state.dealers[index];
+                        return DealerCard(
+                          key: ValueKey(dealer.id),
+                          dealer: dealer,
+                          onTap: () {
+                            context.push(
+                              '/diller/${dealer.id}',
+                              extra: dealer,
                             );
                           },
-                        ),
-                      ),
-                      RefreshingOverlay(
-                        isRefreshing: state.isRefreshing,
-                        message: AppLocalizations.of(context)!.dealersLoading,
-                      ),
-                    ],
+                        );
+                      },
+                    ),
                   );
                 }
                 return const SizedBox.shrink();

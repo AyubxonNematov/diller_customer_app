@@ -2,20 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:sement_market_customer/core/theme/app_theme.dart';
 import 'package:sement_market_customer/features/dealers/data/models/product_model.dart';
 
-class HorizontalProductCard extends StatelessWidget {
-  const HorizontalProductCard({
+class ProductCard extends StatelessWidget {
+  const ProductCard({
     super.key,
     required this.product,
     this.onTap,
+    this.onAddToCart,
   });
 
   final ProductModel product;
   final VoidCallback? onTap;
+  final VoidCallback? onAddToCart;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -23,7 +25,6 @@ class HorizontalProductCard extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 20,
-            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -31,15 +32,15 @@ class HorizontalProductCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(24),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(10),
           child: Row(
             children: [
               // Product Image
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: SizedBox(
-                  width: 80,
-                  height: 80,
+                  width: 100,
+                  height: 100,
                   child: _buildImage(),
                 ),
               ),
@@ -49,40 +50,17 @@ class HorizontalProductCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            product.name,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF1E2D3D),
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (product.earningsPerUnit != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE8F5E9),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              '+${product.earningsPerUnit} ISH HAQI/QOP',
-                              style: const TextStyle(
-                                fontSize: 8,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF2E7D32),
-                              ),
-                            ),
-                          ),
-                      ],
+                    Text(
+                      product.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF1E2D3D),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
                       product.brandName?.toUpperCase() ?? '',
                       style: const TextStyle(
@@ -97,41 +75,43 @@ class HorizontalProductCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: _formatPrice(product.price),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF1E2D3D),
-                                ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${_formatPrice(product.price)} uzs/${product.unitName?.toLowerCase() ?? 'qop'}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF1E2D3D),
                               ),
-                              TextSpan(
-                                text: ' SUM/QOP',
+                            ),
+                            if (product.earningsPerUnit != null)
+                              Text(
+                                '+${_formatPrice(product.earningsPerUnit!)} ish haqi/${product.unitName?.toLowerCase() ?? 'qop'}',
                                 style: const TextStyle(
-                                  fontSize: 10,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFF9E9E9E),
+                                  color: Color(0xFF2E7D32),
                                 ),
                               ),
-                            ],
-                          ),
+                          ],
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF161C26),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: const Text(
-                            'SAVATGA',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              letterSpacing: 1,
+                         GestureDetector(
+                          onTap: onAddToCart,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF161C26),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Text(
+                              '🛒',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),

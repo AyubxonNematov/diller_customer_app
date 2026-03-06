@@ -428,12 +428,6 @@ abstract class AppLocalizations {
   /// **'Internet aloqasini tekshiring'**
   String get dealersErrorHint;
 
-  /// No description provided for @dealersLoading.
-  ///
-  /// In uz, this message translates to:
-  /// **'Yuklanmoqda...'**
-  String get dealersLoading;
-
   /// No description provided for @filter.
   ///
   /// In uz, this message translates to:

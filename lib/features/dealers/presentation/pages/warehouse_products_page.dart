@@ -10,12 +10,14 @@ import 'package:sement_market_customer/features/dealers/presentation/widgets/Dea
 import 'package:sement_market_customer/features/dealers/data/models/product_model.dart';
 import 'package:sement_market_customer/features/dealers/data/models/cart_item_model.dart';
 import 'package:sement_market_customer/features/dealers/presentation/bloc/cart_bloc.dart';
-import 'package:sement_market_customer/features/dealers/presentation/widgets/Products/product_card.dart';
+import 'package:sement_market_customer/features/dealers/presentation/widgets/Products/product_details_modal.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Products/products_filter_modal.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Products/products_search_bar.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Products/quantity_selection_bottom_sheet.dart';
 import 'package:sement_market_customer/core/widgets/detail_page_header.dart';
-import 'package:sement_market_customer/core/widgets/refreshing_overlay.dart';
+import 'package:sement_market_customer/core/widgets/success_notification.dart';
+import 'package:sement_market_customer/features/dealers/presentation/widgets/Products/products_list.dart';
+import 'package:sement_market_customer/features/dealers/presentation/widgets/Products/products_loading_view.dart';
 
 class WarehouseProductsPage extends StatefulWidget {
   const WarehouseProductsPage({
@@ -98,7 +100,7 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
             child: BlocBuilder<ProductsBloc, ProductsState>(
               builder: (context, state) {
                 if (state is ProductsLoading) {
-                  return _buildSkeleton();
+                  return const ProductsLoadingView();
                 }
                 if (state is ProductsError) {
                   return DealersErrorState(
@@ -109,7 +111,10 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
                   );
                 }
                 if (state is ProductsLoaded) {
-                  if (state.products.isEmpty && !state.isRefreshing) {
+                  if (state.isRefreshing) {
+                    return const ProductsLoadingView();
+                  }
+                  if (state.products.isEmpty) {
                     return DealersEmptyState(
                       emptyTitle:
                           AppLocalizations.of(context)!.productsEmpty,
@@ -126,57 +131,17 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
                           : null,
                     );
                   }
-                  return Stack(
-                    children: [
-                      RefreshIndicator(
-                        onRefresh: _onRefresh,
-                        color: AppColors.darkNavy,
-                        child: ListView.separated(
-                          controller: _scrollController,
-                          padding: EdgeInsets.only(
-                            left: 16,
-                            right: 16,
-                            top: 8,
-                            bottom: 16 +
-                                (state.hasMore ? 60 : 0) +
-                                MediaQuery.of(context).padding.bottom,
-                          ),
-                          separatorBuilder: (_, __) => const SizedBox(height: 12),
-                          itemCount:
-                              state.products.length + (state.hasMore ? 1 : 0),
-                          itemBuilder: (context, index) {
-                            if (index >= state.products.length) {
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                context
-                                    .read<ProductsBloc>()
-                                    .add(const ProductsLoadMore());
-                              });
-                              return state.isLoadingMore
-                                  ? const Center(
-                                      child: SizedBox(
-                                        width: 24,
-                                        height: 24,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: AppColors.darkNavy,
-                                        ),
-                                      ),
-                                    )
-                                  : const SizedBox.shrink();
-                            }
-                            return ProductCard(
-                              key: ValueKey(state.products[index].id),
-                              product: state.products[index],
-                              onTap: () => _showQuantitySheet(state.products[index]),
-                            );
-                          },
-                        ),
-                      ),
-                      RefreshingOverlay(
-                        isRefreshing: state.isRefreshing,
-                        message: AppLocalizations.of(context)!.dealersLoading,
-                      ),
-                    ],
+                  return ProductsList(
+                    products: state.products,
+                    onRefresh: _onRefresh,
+                    onLoadMore: () => context
+                        .read<ProductsBloc>()
+                        .add(const ProductsLoadMore()),
+                    onProductTap: _showProductDetails,
+                    onAddToCart: _showQuantitySheet,
+                    hasMore: state.hasMore,
+                    isLoadingMore: state.isLoadingMore,
+                    scrollController: _scrollController,
                   );
                 }
                 return const SizedBox.shrink();
@@ -188,163 +153,54 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
     );
   }
 
+  void _showProductDetails(ProductModel product) {
+    ProductDetailsModal.show(
+      context,
+      product: product,
+      onAddToCart: () => _showQuantitySheet(product),
+    );
+  }
+
   void _showQuantitySheet(ProductModel product) {
+    final cartState = context.read<CartBloc>().state;
+    final existingItem = cartState.items.where((item) => item.product.id == product.id).firstOrNull;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => QuantitySelectionBottomSheet(
         product: product,
+        initialQuantity: existingItem?.quantity ?? 0,
         onConfirm: (quantity) {
-          context.read<CartBloc>().add(
-                AddToCart(
-                  CartItemModel(
-                    product: product,
+          if (existingItem != null) {
+            context.read<CartBloc>().add(
+                  UpdateCartItemQuantity(
+                    productId: product.id,
                     quantity: quantity,
-                    warehouseId: widget.warehouse.id,
-                    warehouseName: widget.warehouse.name,
                   ),
-                ),
-              );
+                );
+          } else {
+            context.read<CartBloc>().add(
+                  AddToCart(
+                    CartItemModel(
+                      product: product,
+                      quantity: quantity,
+                      warehouseId: widget.warehouse.id,
+                      warehouseName: widget.warehouse.name,
+                    ),
+                  ),
+                );
+          }
           Navigator.pop(context);
-          _showSuccessOverlay(product, quantity);
+          SuccessNotification.show(
+            context,
+            title: existingItem != null ? 'SAVAT YANGILANDI' : 'SAVATGA QO\'SHILDI',
+            message: '$quantity ${product.unitName ?? 'qop'} ${product.name}',
+          );
         },
       ),
     );
   }
 
-  void _showSuccessOverlay(ProductModel product, int quantity) {
-    final overlay = Overlay.of(context);
-    final overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: MediaQuery.of(context).padding.top + 10,
-        left: 10,
-        right: 10,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2E7D32),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: Color(0x33FFFFFF),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.check, color: Colors.white, size: 32),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'SAVATGA QO\'SHILDI',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                Text(
-                  '$quantity ${product.unitName ?? 'qop'} ${product.name}',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlay.insert(overlayEntry);
-    Future.delayed(const Duration(seconds: 2), () => overlayEntry.remove());
-  }
-
-  Widget _buildSkeleton() {
-    return GridView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 0.72,
-      ),
-      itemCount: 6,
-      itemBuilder: (_, __) => _ProductCardSkeleton(),
-    );
-  }
-}
-
-
-class _ProductCardSkeleton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AspectRatio(
-            aspectRatio: 1.2,
-            child: Container(
-              color: AppColors.graySubtle.withValues(alpha: 0.5),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 14,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: AppColors.graySubtle.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  height: 12,
-                  width: 80,
-                  decoration: BoxDecoration(
-                    color: AppColors.graySubtle.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  height: 16,
-                  width: 70,
-                  decoration: BoxDecoration(
-                    color: AppColors.graySubtle.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

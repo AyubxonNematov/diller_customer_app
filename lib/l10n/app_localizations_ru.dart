@@ -183,9 +183,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dealersErrorHint => 'Проверьте подключение к интернету';
 
   @override
-  String get dealersLoading => 'Загрузка...';
-
-  @override
   String get filter => 'Фильтр';
 
   @override

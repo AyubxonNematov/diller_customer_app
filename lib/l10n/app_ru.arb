@@ -54,7 +54,6 @@
   "dealersEmptyHint": "Попробуйте другую категорию или поиск",
   "dealersError": "Произошла ошибка",
   "dealersErrorHint": "Проверьте подключение к интернету",
-  "dealersLoading": "Загрузка...",
   "filter": "Фильтр",
   "filterCategory": "Категория",
   "filterRegion": "Регион",
