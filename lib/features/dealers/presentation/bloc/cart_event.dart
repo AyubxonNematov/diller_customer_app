@@ -7,20 +7,33 @@ abstract class CartEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+/// Load cart entries from local storage.
 class CartItemsLoaded extends CartEvent {}
 
+/// Fetch fresh warehouse + product data from API.
+class LoadCartData extends CartEvent {}
+
+/// Add a product to cart (lightweight: just IDs + quantity).
 class AddToCart extends CartEvent {
-  final CartItemModel item;
-  const AddToCart(this.item);
+  final int productId;
+  final int warehouseId;
+  final int quantity;
+
+  const AddToCart({
+    required this.productId,
+    required this.warehouseId,
+    this.quantity = 1,
+  });
 
   @override
-  List<Object?> get props => [item];
+  List<Object?> get props => [productId, warehouseId, quantity];
 }
 
 class UpdateCartItemQuantity extends CartEvent {
   final int productId;
   final int quantity;
-  const UpdateCartItemQuantity({required this.productId, required this.quantity});
+  const UpdateCartItemQuantity(
+      {required this.productId, required this.quantity});
 
   @override
   List<Object?> get props => [productId, quantity];

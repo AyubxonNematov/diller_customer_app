@@ -58,5 +58,20 @@ class DealersApi {
       r.data as Map<String, dynamic>,
     );
   }
-}
 
+  /// Fetch warehouse info + only the products whose IDs are in [productIds].
+  Future<Map<String, dynamic>> getWarehouseWithProducts({
+    required int warehouseId,
+    required List<int> productIds,
+  }) async {
+    final params = <String, dynamic>{};
+    if (productIds.isNotEmpty) {
+      params['filter[id]'] = productIds.join(',');
+    }
+    final r = await _client.dio.get(
+      '/warehouses/$warehouseId/warehouse-with-products',
+      queryParameters: params,
+    );
+    return r.data as Map<String, dynamic>;
+  }
+}

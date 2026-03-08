@@ -2,37 +2,44 @@ part of 'cart_bloc.dart';
 
 class CartState extends Equatable {
   const CartState({
-    this.items = const [],
+    this.entries = const [],
+    this.warehouseData = const {},
     this.isLoading = false,
+    this.error,
   });
 
-  final List<CartItemModel> items;
+  /// Lightweight entries stored locally (product_id, warehouse_id, quantity).
+  final List<CartEntry> entries;
+
+  /// Full warehouse + product data fetched from API, keyed by warehouse ID.
+  final Map<int, CartWarehouseData> warehouseData;
+
   final bool isLoading;
+  final String? error;
 
-  double get totalAmount => items.fold(0, (sum, item) => sum + item.totalPrice);
-  double get totalEarnings => items.fold(0, (sum, item) => sum + item.totalEarnings);
+  /// Total item count across all warehouses (for badge).
+  int get totalItemCount => entries.length;
 
-  Map<int, List<CartItemModel>> get groupedItems {
-    final Map<int, List<CartItemModel>> groups = {};
-    for (final item in items) {
-      if (!groups.containsKey(item.warehouseId)) {
-        groups[item.warehouseId] = [];
-      }
-      groups[item.warehouseId]!.add(item);
-    }
-    return groups;
-  }
+  /// Whether we have loaded warehouse data from API.
+  bool get hasData => warehouseData.isNotEmpty;
+
+  /// Get warehouse IDs that have data.
+  List<int> get warehouseIds => warehouseData.keys.toList();
 
   CartState copyWith({
-    List<CartItemModel>? items,
+    List<CartEntry>? entries,
+    Map<int, CartWarehouseData>? warehouseData,
     bool? isLoading,
+    String? error,
   }) {
     return CartState(
-      items: items ?? this.items,
+      entries: entries ?? this.entries,
+      warehouseData: warehouseData ?? this.warehouseData,
       isLoading: isLoading ?? this.isLoading,
+      error: error,
     );
   }
 
   @override
-  List<Object?> get props => [items, isLoading];
+  List<Object?> get props => [entries, warehouseData, isLoading, error];
 }

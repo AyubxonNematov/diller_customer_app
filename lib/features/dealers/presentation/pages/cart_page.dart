@@ -39,7 +39,6 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
 
   void _updateTabController(int newLength) {
     if (newLength == 0) {
-      // Defer disposal to after the current frame to avoid ticker assertion
       if (_tabController != null) {
         final oldController = _tabController!;
         _tabController = null;
@@ -54,10 +53,9 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     }
 
     if (_previousTabCount == newLength && _tabController != null) {
-      return; // No change needed
+      return;
     }
 
-    // Defer old controller disposal and create new one after frame
     final oldController = _tabController;
     final safeIndex = _currentTabIndex.clamp(0, newLength - 1);
 
@@ -82,13 +80,62 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return BlocBuilder<CartBloc, CartState>(
       builder: (context, state) {
-        if (state.items.isEmpty) {
+        // Empty cart
+        if (state.entries.isEmpty) {
           _updateTabController(0);
           return const CartEmptyState();
         }
 
-        final grouped = state.groupedItems;
-        final warehouseIds = grouped.keys.toList();
+        // Loading state (no warehouse data yet)
+        if (state.isLoading && !state.hasData) {
+          return Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AppBar(
+              title: const Text('Savat',
+                  style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.darkNavy)),
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.white,
+            ),
+            body: const Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        // Error state
+        if (state.error != null && !state.hasData) {
+          return Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AppBar(
+              title: const Text('Savat'),
+              backgroundColor: Colors.white,
+            ),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  const SizedBox(height: 16),
+                  const Text('Xatolik yuz berdi',
+                      style: TextStyle(fontSize: 16)),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () =>
+                        context.read<CartBloc>().add(LoadCartData()),
+                    child: const Text('Qayta urinish'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        final warehouseIds = state.warehouseIds;
+        if (warehouseIds.isEmpty) {
+          _updateTabController(0);
+          return const CartEmptyState();
+        }
 
         _updateTabController(warehouseIds.length);
 
@@ -96,37 +143,35 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
           return const SizedBox.shrink();
         }
 
-        // Get items for the currently active tab
+        // Get data for the currently active tab
         final safeIndex = _currentTabIndex.clamp(0, warehouseIds.length - 1);
         final activeWarehouseId = warehouseIds[safeIndex];
-        final activeTabItems = grouped[activeWarehouseId]!;
-        final activeTabTotal =
-            activeTabItems.fold(0.0, (sum, item) => sum + item.totalPrice);
-        final activeTabEarnings =
-            activeTabItems.fold(0.0, (sum, item) => sum + item.totalEarnings);
-        final activeWarehouseName =
-            activeTabItems.first.warehouseName ?? 'Ombor';
+        final activeData = state.warehouseData[activeWarehouseId]!;
 
         return Scaffold(
           backgroundColor: AppColors.background,
           appBar: CartAppBar(
             tabController: _tabController,
             warehouseIds: warehouseIds,
-            grouped: grouped,
+            warehouseData: state.warehouseData,
           ),
           body: Column(
             children: [
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
-                  children: warehouseIds
-                      .map((id) => CartWarehouseTab(items: grouped[id]!))
-                      .toList(),
+                  children: warehouseIds.map((id) {
+                    final data = state.warehouseData[id]!;
+                    return CartWarehouseTab(
+                      items: data.items,
+                      freeDeliveryThreshold: data.freeDeliveryThreshold,
+                    );
+                  }).toList(),
                 ),
               ),
               CartBottomSummary(
-                totalAmount: activeTabTotal,
-                totalEarnings: activeTabEarnings,
+                totalAmount: activeData.totalPrice,
+                totalEarnings: activeData.totalEarnings,
                 isDelivery: _isDelivery,
                 onDeliveryTypeChanged: (val) =>
                     setState(() => _isDelivery = val),
@@ -135,8 +180,8 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                     context,
                     MaterialPageRoute(
                       builder: (_) => LogisticsBiddingPage(
-                        warehouseName: activeWarehouseName,
-                        offeredPrice: activeTabTotal,
+                        warehouseName: activeData.warehouse.name,
+                        offeredPrice: activeData.totalPrice,
                       ),
                     ),
                   );

@@ -7,17 +7,21 @@ class CartWarehouseTab extends StatelessWidget {
   const CartWarehouseTab({
     super.key,
     required this.items,
+    this.freeDeliveryThreshold = 0,
   });
 
   final List<CartItemModel> items;
+  final double freeDeliveryThreshold;
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildFreeDeliveryProgress(items),
-        const SizedBox(height: 16),
+        if (freeDeliveryThreshold > 0) ...[
+          _buildFreeDeliveryProgress(items),
+          const SizedBox(height: 16),
+        ],
         ...items.map((item) => CartItemCard(item: item)),
         const SizedBox(height: 16),
         _buildAddressSection(),
@@ -27,10 +31,9 @@ class CartWarehouseTab extends StatelessWidget {
   }
 
   Widget _buildFreeDeliveryProgress(List<CartItemModel> items) {
-    const double threshold = 3000000;
     final currentTotal = items.fold(0.0, (sum, i) => sum + i.totalPrice);
-    final progress = (currentTotal / threshold).clamp(0.0, 1.0);
-    final remaining = threshold - currentTotal;
+    final progress = (currentTotal / freeDeliveryThreshold).clamp(0.0, 1.0);
+    final remaining = freeDeliveryThreshold - currentTotal;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -65,7 +68,7 @@ class CartWarehouseTab extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             remaining > 0
-                ? 'Savat summasi ${_formatPrice(threshold.toStringAsFixed(0))} sumdan oshsa bepul.'
+                ? 'Savat summasi ${_formatPrice(freeDeliveryThreshold.toStringAsFixed(0))} sumdan oshsa bepul.'
                 : 'Sizga bepul yetkazib beriladi!',
             style: const TextStyle(fontSize: 12, color: AppColors.grayText),
           ),

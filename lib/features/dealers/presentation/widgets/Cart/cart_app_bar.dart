@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:sement_market_customer/core/theme/app_theme.dart';
-import 'package:sement_market_customer/features/dealers/data/models/cart_item_model.dart';
+import 'package:sement_market_customer/features/dealers/data/models/cart_warehouse_data.dart';
 
 class CartAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CartAppBar({
     super.key,
     required this.tabController,
     required this.warehouseIds,
-    required this.grouped,
+    required this.warehouseData,
   });
 
   final TabController? tabController;
   final List<int> warehouseIds;
-  final Map<int, List<CartItemModel>> grouped;
+  final Map<int, CartWarehouseData> warehouseData;
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +53,9 @@ class CartAppBar extends StatelessWidget implements PreferredSizeWidget {
               tabAlignment: TabAlignment.start,
               labelPadding: const EdgeInsets.symmetric(horizontal: 20),
               tabs: warehouseIds.map((id) {
-                final group = grouped[id]!;
-                final name = group.first.warehouseName ?? 'Ombor';
+                final data = warehouseData[id]!;
+                final name = data.warehouse.name;
+                final itemCount = data.items.length;
                 return Tab(
                   height: 48,
                   child: Row(
@@ -76,7 +77,7 @@ class CartAppBar extends StatelessWidget implements PreferredSizeWidget {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
-                          group.length.toString(),
+                          itemCount.toString(),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,

@@ -24,112 +24,110 @@ import 'package:sement_market_customer/features/profile/presentation/pages/profi
 
 abstract class AppRouter {
   static final router = GoRouter(
-        navigatorKey: navigatorKey,
-        initialLocation: '/login',
-        redirect: (context, state) async {
-          final loc = state.matchedLocation;
-          final prefs = await SharedPreferences.getInstance();
-          final token = prefs.getString('auth_token');
-          final isLoginRoute = loc == '/login';
-          if (token != null && isLoginRoute) return '/diller';
-          if (token == null && !isLoginRoute) return '/login';
-          return null;
-        },
-        routes: [
-          GoRoute(
-            path: '/login',
-            builder: (_, __) => BlocProvider(
-              create: (_) => AuthBloc(),
-              child: const LoginPage(),
-            ),
+    navigatorKey: navigatorKey,
+    initialLocation: '/login',
+    redirect: (context, state) async {
+      final loc = state.matchedLocation;
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+      final isLoginRoute = loc == '/login';
+      if (token != null && isLoginRoute) return '/diller';
+      if (token == null && !isLoginRoute) return '/login';
+      return null;
+    },
+    routes: [
+      GoRoute(
+        path: '/login',
+        builder: (_, __) => BlocProvider(
+          create: (_) => AuthBloc(),
+          child: const LoginPage(),
+        ),
+      ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) => BlocProvider(
+          create: (_) => ProfileBloc()..add(const ProfileLoad()),
+          child: _FcmSyncWrapper(
+            child: _MainShell(navigationShell: navigationShell),
           ),
-          StatefulShellRoute.indexedStack(
-            builder: (context, state, navigationShell) => BlocProvider(
-              create: (_) => ProfileBloc()..add(const ProfileLoad()),
-              child: _FcmSyncWrapper(
-                child: _MainShell(navigationShell: navigationShell),
-              ),
-            ),
-            branches: [
-              StatefulShellBranch(
+        ),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/diller',
                 routes: [
                   GoRoute(
-                    path: '/diller',
+                    path: ':id',
                     routes: [
                       GoRoute(
-                        path: ':id',
-                        routes: [
-                          GoRoute(
-                            path: 'w/:warehouseId',
-                            builder: (context, state) {
-                              final warehouse =
-                                  state.extra as WarehouseModel?;
-                              if (warehouse == null) {
-                                return const SizedBox.shrink();
-                              }
-                              return BlocProvider(
-                                create: (_) =>
-                                    ProductsBloc(warehouse: warehouse),
-                                child: WarehouseProductsPage(
-                                  warehouse: warehouse,
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                        path: 'w/:warehouseId',
                         builder: (context, state) {
-                          final dealer = state.extra as DealerModel?;
-                          if (dealer == null) {
+                          final warehouse = state.extra as WarehouseModel?;
+                          if (warehouse == null) {
                             return const SizedBox.shrink();
                           }
                           return BlocProvider(
-                            create: (_) => WarehousesBloc(dealer: dealer),
-                            child: DealerWarehousesPage(dealer: dealer),
+                            create: (_) => ProductsBloc(warehouse: warehouse),
+                            child: WarehouseProductsPage(
+                              warehouse: warehouse,
+                            ),
                           );
                         },
                       ),
                     ],
-                    builder: (_, __) => BlocProvider(
-                      create: (_) => DealersBloc(),
-                      child: const DealersPage(),
-                    ),
+                    builder: (context, state) {
+                      final dealer = state.extra as DealerModel?;
+                      if (dealer == null) {
+                        return const SizedBox.shrink();
+                      }
+                      return BlocProvider(
+                        create: (_) => WarehousesBloc(dealer: dealer),
+                        child: DealerWarehousesPage(dealer: dealer),
+                      );
+                    },
                   ),
                 ],
-              ),
-              StatefulShellBranch(
-                routes: [
-                  GoRoute(
-                    path: '/zakazlar',
-                    builder: (c, __) => _PlaceholderPage(
-                      title: AppLocalizations.of(c)!.zakazlar,
-                    ),
-                  ),
-                ],
-              ),
-              StatefulShellBranch(
-                routes: [
-                  GoRoute(
-                    path: '/savat',
-                    builder: (c, __) => const CartPage(),
-                  ),
-                ],
-              ),
-              StatefulShellBranch(
-                routes: [
-                  GoRoute(
-                    path: '/profile',
-                    builder: (_, __) => const ProfilePage(),
-                  ),
-                ],
+                builder: (_, __) => BlocProvider(
+                  create: (_) => DealersBloc(),
+                  child: const DealersPage(),
+                ),
               ),
             ],
           ),
-          GoRoute(
-            path: '/notifications',
-            builder: (_, __) => const NotificationsPage(),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/zakazlar',
+                builder: (c, __) => _PlaceholderPage(
+                  title: AppLocalizations.of(c)!.zakazlar,
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/savat',
+                builder: (c, __) => const CartPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (_, __) => const ProfilePage(),
+              ),
+            ],
           ),
         ],
-      );
+      ),
+      GoRoute(
+        path: '/notifications',
+        builder: (_, __) => const NotificationsPage(),
+      ),
+    ],
+  );
 }
 
 class _FcmSyncWrapper extends StatefulWidget {
@@ -193,27 +191,27 @@ class _MainShell extends StatelessWidget {
               activeIcon: const Icon(Icons.receipt_long),
               label: AppLocalizations.of(context)!.navZakazlar,
             ),
-              BottomNavigationBarItem(
-                icon: BlocBuilder<CartBloc, CartState>(
-                  builder: (context, state) {
-                    return Badge(
-                      label: Text(state.items.length.toString()),
-                      isLabelVisible: state.items.isNotEmpty,
-                      child: const Icon(Icons.shopping_cart_outlined),
-                    );
-                  },
-                ),
-                activeIcon: BlocBuilder<CartBloc, CartState>(
-                  builder: (context, state) {
-                    return Badge(
-                      label: Text(state.items.length.toString()),
-                      isLabelVisible: state.items.isNotEmpty,
-                      child: const Icon(Icons.shopping_cart),
-                    );
-                  },
-                ),
-                label: AppLocalizations.of(context)!.navSavat,
+            BottomNavigationBarItem(
+              icon: BlocBuilder<CartBloc, CartState>(
+                builder: (context, state) {
+                  return Badge(
+                    label: Text(state.totalItemCount.toString()),
+                    isLabelVisible: state.entries.isNotEmpty,
+                    child: const Icon(Icons.shopping_cart_outlined),
+                  );
+                },
               ),
+              activeIcon: BlocBuilder<CartBloc, CartState>(
+                builder: (context, state) {
+                  return Badge(
+                    label: Text(state.totalItemCount.toString()),
+                    isLabelVisible: state.entries.isNotEmpty,
+                    child: const Icon(Icons.shopping_cart),
+                  );
+                },
+              ),
+              label: AppLocalizations.of(context)!.navSavat,
+            ),
             BottomNavigationBarItem(
               icon: const Icon(Icons.person_outline),
               activeIcon: const Icon(Icons.person),

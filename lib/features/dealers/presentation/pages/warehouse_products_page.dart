@@ -8,7 +8,7 @@ import 'package:sement_market_customer/features/dealers/presentation/bloc/produc
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Dealers/dealers_empty_state.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Dealers/dealers_error_state.dart';
 import 'package:sement_market_customer/features/dealers/data/models/product_model.dart';
-import 'package:sement_market_customer/features/dealers/data/models/cart_item_model.dart';
+
 import 'package:sement_market_customer/features/dealers/presentation/bloc/cart_bloc.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Products/product_details_modal.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Products/products_filter_modal.dart';
@@ -161,9 +161,8 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
 
   void _showQuantitySheet(ProductModel product) {
     final cartState = context.read<CartBloc>().state;
-    final existingItem = cartState.items
-        .where((item) => item.product.id == product.id)
-        .firstOrNull;
+    final existingEntry =
+        cartState.entries.where((e) => e.productId == product.id).firstOrNull;
 
     showModalBottomSheet(
       context: context,
@@ -171,9 +170,9 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
       backgroundColor: Colors.transparent,
       builder: (_) => QuantitySelectionBottomSheet(
         product: product,
-        initialQuantity: existingItem?.quantity ?? 0,
+        initialQuantity: existingEntry?.quantity ?? 0,
         onConfirm: (quantity) {
-          if (existingItem != null) {
+          if (existingEntry != null) {
             context.read<CartBloc>().add(
                   UpdateCartItemQuantity(
                     productId: product.id,
@@ -183,19 +182,16 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
           } else {
             context.read<CartBloc>().add(
                   AddToCart(
-                    CartItemModel(
-                      product: product,
-                      quantity: quantity,
-                      warehouseId: widget.warehouse.id,
-                      warehouseName: widget.warehouse.name,
-                    ),
+                    productId: product.id,
+                    warehouseId: widget.warehouse.id,
+                    quantity: quantity,
                   ),
                 );
           }
           Navigator.pop(context);
           SuccessNotification.show(
             context,
-            title: existingItem != null
+            title: existingEntry != null
                 ? 'SAVAT YANGILANDI'
                 : 'SAVATGA QO\'SHILDI',
             message: '$quantity ${product.unitName ?? 'qop'} ${product.name}',
