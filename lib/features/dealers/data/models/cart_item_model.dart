@@ -15,12 +15,16 @@ class CartItemModel extends Equatable {
   final String? warehouseName;
 
   double get totalPrice {
-    final priceNum = double.tryParse(product.price.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0.0;
+    final priceNum =
+        double.tryParse(product.price.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0.0;
     return priceNum * quantity;
   }
 
   double get totalEarnings {
-    final earningsNum = double.tryParse(product.earningsPerUnit?.replaceAll(RegExp(r'[^\d.]'), '') ?? '0') ?? 0.0;
+    final earningsNum = double.tryParse(
+            product.earningsPerUnit?.replaceAll(RegExp(r'[^\d.]'), '') ??
+                '0') ??
+        0.0;
     return earningsNum * quantity;
   }
 

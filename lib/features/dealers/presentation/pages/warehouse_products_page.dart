@@ -105,9 +105,8 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
                 if (state is ProductsError) {
                   return DealersErrorState(
                     message: state.message,
-                    onRetry: () => context
-                        .read<ProductsBloc>()
-                        .add(const ProductsLoad()),
+                    onRetry: () =>
+                        context.read<ProductsBloc>().add(const ProductsLoad()),
                   );
                 }
                 if (state is ProductsLoaded) {
@@ -116,8 +115,7 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
                   }
                   if (state.products.isEmpty) {
                     return DealersEmptyState(
-                      emptyTitle:
-                          AppLocalizations.of(context)!.productsEmpty,
+                      emptyTitle: AppLocalizations.of(context)!.productsEmpty,
                       emptyHint:
                           AppLocalizations.of(context)!.productsEmptyHint,
                       hasActiveFilters: state.activeFiltersCount > 0,
@@ -163,7 +161,9 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
 
   void _showQuantitySheet(ProductModel product) {
     final cartState = context.read<CartBloc>().state;
-    final existingItem = cartState.items.where((item) => item.product.id == product.id).firstOrNull;
+    final existingItem = cartState.items
+        .where((item) => item.product.id == product.id)
+        .firstOrNull;
 
     showModalBottomSheet(
       context: context,
@@ -195,12 +195,13 @@ class _WarehouseProductsPageState extends State<WarehouseProductsPage> {
           Navigator.pop(context);
           SuccessNotification.show(
             context,
-            title: existingItem != null ? 'SAVAT YANGILANDI' : 'SAVATGA QO\'SHILDI',
+            title: existingItem != null
+                ? 'SAVAT YANGILANDI'
+                : 'SAVATGA QO\'SHILDI',
             message: '$quantity ${product.unitName ?? 'qop'} ${product.name}',
           );
         },
       ),
     );
   }
-
 }

@@ -18,67 +18,77 @@ class CartAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      elevation: 0,
       title: const Text(
         'Savat',
-        style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.darkNavy),
+        style: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w900,
+          color: AppColors.darkNavy,
+        ),
       ),
       bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: TabBar(
-            controller: tabController,
-            isScrollable: true,
-            indicatorColor: Colors.transparent,
-            dividerColor: Colors.transparent,
-            tabAlignment: TabAlignment.start,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            labelPadding: const EdgeInsets.only(right: 8),
-            tabs: warehouseIds.map((id) {
-              final group = grouped[id]!;
-              final name = group.first.warehouseName ?? 'Ombor';
-              return Tab(
-                height: 36,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: AppColors.darkNavy,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+        preferredSize: const Size.fromHeight(48),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: AppColors.graySubtle.withValues(alpha: 0.3),
+                width: 1,
+              ),
+            ),
+          ),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: TabBar(
+              controller: tabController,
+              isScrollable: true,
+              indicatorColor: AppColors.darkNavy,
+              indicatorWeight: 3,
+              indicatorSize: TabBarIndicatorSize.label,
+              dividerColor: Colors.transparent,
+              labelColor: AppColors.darkNavy,
+              unselectedLabelColor: AppColors.grayText,
+              tabAlignment: TabAlignment.start,
+              labelPadding: const EdgeInsets.symmetric(horizontal: 20),
+              tabs: warehouseIds.map((id) {
+                final group = grouped[id]!;
+                final name = group.first.warehouseName ?? 'Ombor';
+                return Tab(
+                  height: 48,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        name.toUpperCase(),
+                        name,
                         style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Icon(Icons.check, size: 12, color: Colors.green),
-                      const SizedBox(width: 4),
                       Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: AppColors.gold,
-                          shape: BoxShape.circle,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.goldLight,
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
                           group.length.toString(),
-                          style: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.darkNavy,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.gold.withValues(alpha: 0.9),
                           ),
                         ),
                       ),
                     ],
                   ),
-                ),
-              );
-            }).toList(),
+                );
+              }).toList(),
+            ),
           ),
         ),
       ),
@@ -86,5 +96,5 @@ class CartAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(116); // 56 + 60
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 48);
 }

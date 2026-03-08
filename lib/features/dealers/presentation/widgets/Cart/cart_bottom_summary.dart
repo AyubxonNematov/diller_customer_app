@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:sement_market_customer/core/theme/app_theme.dart';
-import 'package:sement_market_customer/features/dealers/presentation/bloc/cart_bloc.dart';
 
 class CartBottomSummary extends StatelessWidget {
   const CartBottomSummary({
     super.key,
-    required this.state,
+    required this.totalAmount,
+    required this.totalEarnings,
     required this.isDelivery,
     required this.onDeliveryTypeChanged,
     this.onBiddingTap,
   });
 
-  final CartState state;
+  final double totalAmount;
+  final double totalEarnings;
   final bool isDelivery;
   final ValueChanged<bool> onDeliveryTypeChanged;
   final VoidCallback? onBiddingTap;
@@ -23,7 +24,10 @@ class CartBottomSummary extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -5))],
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black12, blurRadius: 10, offset: Offset(0, -5))
+        ],
       ),
       child: SafeArea(
         child: Column(
@@ -38,17 +42,23 @@ class CartBottomSummary extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Mollar: ${_formatPrice(state.totalAmount.toStringAsFixed(0))} sum',
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.grayText),
+                      'Mollar: ${_formatPrice(totalAmount.toStringAsFixed(0))} sum',
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.grayText),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      isDelivery ? 'Logistika: Hisoblanmagan' : 'Logistika: O\'zim olaman',
+                      isDelivery
+                          ? 'Logistika: Hisoblanmagan'
+                          : 'Logistika: O\'zim olaman',
                       style: TextStyle(
-                        fontSize: 14, 
-                        fontWeight: FontWeight.w700, 
-                        color: isDelivery ? Colors.blue[700] : AppColors.grayText
-                      ),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: isDelivery
+                              ? Colors.blue[700]
+                              : AppColors.grayText),
                     ),
                   ],
                 ),
@@ -56,12 +66,18 @@ class CartBottomSummary extends StatelessWidget {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: _formatPrice(state.totalAmount.toStringAsFixed(0)),
-                        style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: AppColors.darkNavy),
+                        text: _formatPrice(totalAmount.toStringAsFixed(0)),
+                        style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.darkNavy),
                       ),
                       const TextSpan(
                         text: ' SUM',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppColors.darkNavy),
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.darkNavy),
                       ),
                     ],
                   ),
@@ -69,10 +85,11 @@ class CartBottomSummary extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            if (state.totalEarnings > 0)
+            if (totalEarnings > 0)
               Container(
                 margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFFE8F5E9),
                   borderRadius: BorderRadius.circular(12),
@@ -80,11 +97,15 @@ class CartBottomSummary extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.wallet_giftcard, size: 16, color: Color(0xFF2E7D32)),
+                    const Icon(Icons.wallet_giftcard,
+                        size: 16, color: Color(0xFF2E7D32)),
                     const SizedBox(width: 8),
                     Text(
-                      'Jami ish haqi: +${_formatPrice(state.totalEarnings.toStringAsFixed(0))} sum',
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF2E7D32)),
+                      'Jami ish haqi: +${_formatPrice(totalEarnings.toStringAsFixed(0))} sum',
+                      style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF2E7D32)),
                     ),
                   ],
                 ),
@@ -103,12 +124,14 @@ class CartBottomSummary extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   backgroundColor: const Color(0xFFF5BF1A),
                   foregroundColor: AppColors.darkNavy,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
                 child: Text(
                   isDelivery ? 'HAYDOVCHI QIDIRISH' : 'BUYURTMA BERISH',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w900),
                 ),
               ),
             ),
@@ -128,10 +151,12 @@ class CartBottomSummary extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: _toggleItem('🚚 YETKAZISH', isDelivery, () => onDeliveryTypeChanged(true)),
+            child: _toggleItem(
+                '🚚 YETKAZISH', isDelivery, () => onDeliveryTypeChanged(true)),
           ),
           Expanded(
-            child: _toggleItem('🏢 O\'ZIM OLAMAN', !isDelivery, () => onDeliveryTypeChanged(false)),
+            child: _toggleItem('🏢 O\'ZIM OLAMAN', !isDelivery,
+                () => onDeliveryTypeChanged(false)),
           ),
         ],
       ),
@@ -146,7 +171,9 @@ class CartBottomSummary extends StatelessWidget {
         decoration: BoxDecoration(
           color: isActive ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(21),
-          boxShadow: isActive ? [const BoxShadow(color: Colors.black12, blurRadius: 4)] : null,
+          boxShadow: isActive
+              ? [const BoxShadow(color: Colors.black12, blurRadius: 4)]
+              : null,
         ),
         alignment: Alignment.center,
         child: Text(
@@ -163,7 +190,8 @@ class CartBottomSummary extends StatelessWidget {
 
   String _formatPrice(String price) {
     try {
-      final value = double.tryParse(price.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
+      final value =
+          double.tryParse(price.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
       return value.toStringAsFixed(0).replaceAllMapped(
             RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
             (Match m) => '${m[1]},',
