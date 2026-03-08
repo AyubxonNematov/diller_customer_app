@@ -32,7 +32,9 @@ class CartItemCard extends StatelessWidget {
                   width: 60,
                   height: 60,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(color: AppColors.background, child: const Icon(Icons.image)),
+                  errorBuilder: (_, __, ___) => Container(
+                      color: AppColors.background,
+                      child: const Icon(Icons.image)),
                 ),
               ),
               const SizedBox(width: 12),
@@ -42,19 +44,27 @@ class CartItemCard extends StatelessWidget {
                   children: [
                     Text(
                       item.product.name,
-                      style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.darkNavy),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.darkNavy),
                     ),
                     Text(
                       '${_formatPrice(item.product.price)} sum / ${item.product.unitName ?? 'qop'}',
-                      style: const TextStyle(fontSize: 12, color: AppColors.darkNavy, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.darkNavy,
+                          fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
               ),
               IconButton(
-                onPressed: () => context.read<CartBloc>().add(RemoveFromCart(item.product.id)),
+                onPressed: () => context
+                    .read<CartBloc>()
+                    .add(RemoveFromCart(item.product.id)),
                 icon: const Icon(Icons.delete_outline, color: Colors.red),
-                style: IconButton.styleFrom(backgroundColor: Colors.red.shade50),
+                style:
+                    IconButton.styleFrom(backgroundColor: Colors.red.shade50),
               ),
             ],
           ),
@@ -65,7 +75,10 @@ class CartItemCard extends StatelessWidget {
               _buildQuantityController(context),
               Text(
                 '${_formatPrice(item.totalPrice.toStringAsFixed(0))} sum',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppColors.darkNavy),
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.darkNavy),
               ),
             ],
           ),
@@ -97,15 +110,22 @@ class CartItemCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            onPressed: () => context.read<CartBloc>().add(UpdateCartItemQuantity(productId: item.product.id, quantity: item.quantity - 1)),
+            onPressed: () => context.read<CartBloc>().add(
+                UpdateCartItemQuantity(
+                    productId: item.product.id, quantity: item.quantity - 1)),
             icon: const Icon(Icons.remove, size: 18, color: Color(0xFF1E2D3D)),
           ),
           Text(
             item.quantity.toString(),
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF1E2D3D)),
+            style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+                color: Color(0xFF1E2D3D)),
           ),
           IconButton(
-            onPressed: () => context.read<CartBloc>().add(UpdateCartItemQuantity(productId: item.product.id, quantity: item.quantity + 1)),
+            onPressed: () => context.read<CartBloc>().add(
+                UpdateCartItemQuantity(
+                    productId: item.product.id, quantity: item.quantity + 1)),
             icon: const Icon(Icons.add, size: 18, color: Color(0xFF1E2D3D)),
           ),
         ],
@@ -117,13 +137,15 @@ class CartItemCard extends StatelessWidget {
     final bool isNeg = delta < 0;
     return Expanded(
       child: InkWell(
-        onTap: () => context.read<CartBloc>().add(UpdateCartItemQuantity(productId: item.product.id, quantity: item.quantity + delta)),
+        onTap: () => context.read<CartBloc>().add(UpdateCartItemQuantity(
+            productId: item.product.id, quantity: item.quantity + delta)),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: isNeg ? Colors.red[50] : Colors.green[50],
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: isNeg ? Colors.red[100]! : Colors.green[100]!),
+            border: Border.all(
+                color: isNeg ? Colors.red[100]! : Colors.green[100]!),
           ),
           child: Text(
             (delta > 0 ? '+$delta' : '$delta'),
@@ -141,7 +163,8 @@ class CartItemCard extends StatelessWidget {
 
   String _formatPrice(String price) {
     try {
-      final value = double.tryParse(price.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
+      final value =
+          double.tryParse(price.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
       return value.toStringAsFixed(0).replaceAllMapped(
             RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
             (Match m) => '${m[1]},',

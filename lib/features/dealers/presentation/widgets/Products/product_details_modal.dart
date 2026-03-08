@@ -86,7 +86,8 @@ class ProductDetailsModal extends StatelessWidget {
                               children: List.generate(
                                 product.images.length,
                                 (index) => Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                                  margin:
+                                      const EdgeInsets.symmetric(horizontal: 4),
                                   width: 8,
                                   height: 8,
                                   decoration: BoxDecoration(
@@ -175,11 +176,13 @@ class ProductDetailsModal extends StatelessWidget {
                         ),
                       ],
                     ),
-                    if (product.earningsPerUnit != null && product.earningsPerUnit != '0')
+                    if (product.earningsPerUnit != null &&
+                        product.earningsPerUnit != '0')
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: Colors.green[50],
                             borderRadius: BorderRadius.circular(8),
@@ -226,11 +229,7 @@ class ProductDetailsModal extends StatelessWidget {
           // Bottom Action
           Padding(
             padding: EdgeInsets.fromLTRB(
-              24, 
-              16, 
-              24, 
-              16 + MediaQuery.of(context).padding.bottom
-            ),
+                24, 16, 24, 16 + MediaQuery.of(context).padding.bottom),
             child: SizedBox(
               width: double.infinity,
               height: 56,
