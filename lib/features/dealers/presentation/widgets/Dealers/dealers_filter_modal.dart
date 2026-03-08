@@ -52,10 +52,10 @@ class _DealersFilterModalState extends State<DealersFilterModal> {
   int? _selectedCategoryId;
   int? _selectedRegionId;
 
-  Map<int, List<CategoryModel>> _categoryChildren = {};
-  Map<int, List<RegionModel>> _regionChildren = {};
-  Set<int> _expandedCategoryIds = {};
-  Set<int> _expandedRegionIds = {};
+  final Map<int, List<CategoryModel>> _categoryChildren = {};
+  final Map<int, List<RegionModel>> _regionChildren = {};
+  final Set<int> _expandedCategoryIds = {};
+  final Set<int> _expandedRegionIds = {};
 
   @override
   void initState() {
@@ -306,8 +306,8 @@ class _DealersFilterModalState extends State<DealersFilterModal> {
             _loadCategoryChildren(cat.id);
           });
         } else {
-          setState(() =>
-              _selectedCategoryId = _selectedCategoryId == cat.id ? null : cat.id);
+          setState(() => _selectedCategoryId =
+              _selectedCategoryId == cat.id ? null : cat.id);
         }
       },
       onExpand: hasChildren

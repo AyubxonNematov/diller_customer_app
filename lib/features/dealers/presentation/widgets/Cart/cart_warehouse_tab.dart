@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sement_market_customer/core/theme/app_theme.dart';
-import 'package:sement_market_customer/features/dealers/presentation/bloc/cart_bloc.dart';
 import 'package:sement_market_customer/features/dealers/data/models/cart_item_model.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Cart/cart_item_card.dart';
 
@@ -49,7 +47,10 @@ class CartWarehouseTab extends StatelessWidget {
               SizedBox(width: 8),
               Text(
                 'BEPUL YETKAZISH UCHUN',
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.darkNavy),
+                style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.darkNavy),
               ),
             ],
           ),
@@ -63,8 +64,8 @@ class CartWarehouseTab extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            remaining > 0 
-                ? 'Savat summasi ${_formatPrice(threshold.toStringAsFixed(0))} sumdan oshsa bepul.' 
+            remaining > 0
+                ? 'Savat summasi ${_formatPrice(threshold.toStringAsFixed(0))} sumdan oshsa bepul.'
                 : 'Sizga bepul yetkazib beriladi!',
             style: const TextStyle(fontSize: 12, color: AppColors.grayText),
           ),
@@ -85,7 +86,10 @@ class CartWarehouseTab extends StatelessWidget {
         children: [
           const Text(
             'YETKAZISH MANZILI',
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.darkNavy),
+            style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                color: AppColors.darkNavy),
           ),
           const SizedBox(height: 8),
           const Text(
@@ -100,7 +104,11 @@ class CartWarehouseTab extends StatelessWidget {
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            child: const Text('TAHRIRLASH', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.blue)),
+            child: const Text('TAHRIRLASH',
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.blue)),
           ),
         ],
       ),
@@ -109,7 +117,8 @@ class CartWarehouseTab extends StatelessWidget {
 
   String _formatPrice(String price) {
     try {
-      final value = double.tryParse(price.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
+      final value =
+          double.tryParse(price.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
       return value.toStringAsFixed(0).replaceAllMapped(
             RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
             (Match m) => '${m[1]},',

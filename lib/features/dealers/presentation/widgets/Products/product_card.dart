@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sement_market_customer/core/theme/app_theme.dart';
 import 'package:sement_market_customer/features/dealers/data/models/product_model.dart';
 
 class ProductCard extends StatelessWidget {
@@ -97,10 +96,11 @@ class ProductCard extends StatelessWidget {
                               ),
                           ],
                         ),
-                         GestureDetector(
+                        GestureDetector(
                           onTap: onAddToCart,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8),
                             decoration: BoxDecoration(
                               color: const Color(0xFF161C26),
                               borderRadius: BorderRadius.circular(14),

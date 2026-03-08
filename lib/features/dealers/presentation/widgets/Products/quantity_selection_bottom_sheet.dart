@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sement_market_customer/core/theme/app_theme.dart';
 import 'package:sement_market_customer/features/dealers/data/models/product_model.dart';
 
 class QuantitySelectionBottomSheet extends StatefulWidget {
@@ -15,10 +14,12 @@ class QuantitySelectionBottomSheet extends StatefulWidget {
   final int initialQuantity;
 
   @override
-  State<QuantitySelectionBottomSheet> createState() => _QuantitySelectionBottomSheetState();
+  State<QuantitySelectionBottomSheet> createState() =>
+      _QuantitySelectionBottomSheetState();
 }
 
-class _QuantitySelectionBottomSheetState extends State<QuantitySelectionBottomSheet> {
+class _QuantitySelectionBottomSheetState
+    extends State<QuantitySelectionBottomSheet> {
   late final TextEditingController _controller;
   late int _quantity;
 
@@ -35,23 +36,28 @@ class _QuantitySelectionBottomSheetState extends State<QuantitySelectionBottomSh
     super.dispose();
   }
 
-void _updateQuantity(int delta) {
-  setState(() {
-    _quantity = (_quantity + delta).clamp(1, 999999);
-    _controller.text = _quantity.toString();
-    _controller.selection = TextSelection.fromPosition(
-      TextPosition(offset: _controller.text.length),
-    );
-  });
-}
+  void _updateQuantity(int delta) {
+    setState(() {
+      _quantity = (_quantity + delta).clamp(1, 999999);
+      _controller.text = _quantity.toString();
+      _controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: _controller.text.length),
+      );
+    });
+  }
 
   double get _totalEarnings {
-    final earningsNum = double.tryParse(widget.product.earningsPerUnit?.replaceAll(RegExp(r'[^\d.]'), '') ?? '0') ?? 0.0;
+    final earningsNum = double.tryParse(
+            widget.product.earningsPerUnit?.replaceAll(RegExp(r'[^\d.]'), '') ??
+                '0') ??
+        0.0;
     return earningsNum * _quantity;
   }
 
   double get _totalPrice {
-    final priceNum = double.tryParse(widget.product.price.replaceAll(RegExp(r'[^\d.]'), '') ?? '0') ?? 0.0;
+    final priceNum = double.tryParse(
+            widget.product.price.replaceAll(RegExp(r'[^\d.]'), '') ?? '0') ??
+        0.0;
     return priceNum * _quantity;
   }
 
@@ -115,7 +121,8 @@ void _updateQuantity(int delta) {
                 backgroundColor: const Color(0xFFF5BF1A),
                 foregroundColor: const Color(0xFF1E2D3D),
                 elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
               ),
               child: const Text(
                 'TASDIQLASH',
@@ -128,105 +135,105 @@ void _updateQuantity(int delta) {
     );
   }
 
-Widget _buildQuantityInput() {
-  return Container(
-    height: 70,
-    padding: const EdgeInsets.symmetric(horizontal: 16),
-    decoration: BoxDecoration(
-      color: const Color(0xFFF8F8F8),
-      borderRadius: BorderRadius.circular(16),
-    ),
-    child: Row(
-      children: [
-        IconButton(
-          onPressed: () => _updateQuantity(-1),
-          icon: const Icon(Icons.remove_circle_outline, size: 28),
-          color: const Color(0xFF1E2D3D),
-        ),
-        Expanded(
-          child: TextField(
-            controller: _controller,
-            keyboardType: TextInputType.number,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w900,
-              color: Color(0xFF1E2D3D),
-            ),
-            decoration: const InputDecoration(
-              border: InputBorder.none,
-              hintText: "1",
-            ),
-          onChanged: (v) {
-              if (v.isEmpty) {
-                _quantity = 1;
-              } else {
-                int? val = int.tryParse(v);
-                if (val != null) {
-                  _quantity = val.clamp(1, 999999);
-                }
-              }
-              setState(() {});
-            },
+  Widget _buildQuantityInput() {
+    return Container(
+      height: 70,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F8F8),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () => _updateQuantity(-1),
+            icon: const Icon(Icons.remove_circle_outline, size: 28),
+            color: const Color(0xFF1E2D3D),
           ),
-        ),
-        IconButton(
-          onPressed: () => _updateQuantity(1),
-          icon: const Icon(Icons.add_circle_outline, size: 28),
-          color: const Color(0xFF1E2D3D),
-        ),
-      ],
-    ),
-  );
-}
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+                color: Color(0xFF1E2D3D),
+              ),
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                hintText: "1",
+              ),
+              onChanged: (v) {
+                if (v.isEmpty) {
+                  _quantity = 1;
+                } else {
+                  int? val = int.tryParse(v);
+                  if (val != null) {
+                    _quantity = val.clamp(1, 999999);
+                  }
+                }
+                setState(() {});
+              },
+            ),
+          ),
+          IconButton(
+            onPressed: () => _updateQuantity(1),
+            icon: const Icon(Icons.add_circle_outline, size: 28),
+            color: const Color(0xFF1E2D3D),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildTotalPriceInfo() {
-  return Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: const Color(0xFFE8F5E9),
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: const Color(0xFFC8E6C9)),
-    ),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text(
-          'Jami narxi :',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF2E7D32),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFC8E6C9)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Jami narxi :',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF2E7D32),
+            ),
           ),
-        ),
-        // Narxlarni ustma-ust chiqarish uchun Column ishlatamiz
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '${_formatPrice(_totalPrice.toStringAsFixed(0))} sum',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
-                color: Color(0xFF1B5E20),
+          // Narxlarni ustma-ust chiqarish uchun Column ishlatamiz
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '${_formatPrice(_totalPrice.toStringAsFixed(0))} sum',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF1B5E20),
+                ),
               ),
-            ),
-            // Agar foyda (earnings) ham kerak bo'lsa:
-            Text(
-              'Ish haqi: ${_formatPrice(_totalEarnings.toStringAsFixed(0))} sum',
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF43A047), // Sal ochroq yashil
+              // Agar foyda (earnings) ham kerak bo'lsa:
+              Text(
+                'Ish haqi: ${_formatPrice(_totalEarnings.toStringAsFixed(0))} sum',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF43A047), // Sal ochroq yashil
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildQuickButtons() {
     return Wrap(
@@ -250,9 +257,11 @@ Widget _buildQuantityInput() {
         onPressed: () => _updateQuantity(delta),
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 12),
-          side: BorderSide(color: isNeg ? Colors.red[100]! : Colors.green[100]!),
+          side:
+              BorderSide(color: isNeg ? Colors.red[100]! : Colors.green[100]!),
           backgroundColor: isNeg ? Colors.red[50] : Colors.green[50],
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
         child: Text(
           label,
@@ -268,7 +277,8 @@ Widget _buildQuantityInput() {
 
   String _formatPrice(String price) {
     try {
-      final value = double.tryParse(price.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
+      final value =
+          double.tryParse(price.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
       return value.toStringAsFixed(0).replaceAllMapped(
             RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
             (Match m) => '${m[1]},',

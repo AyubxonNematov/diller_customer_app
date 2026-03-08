@@ -11,7 +11,6 @@ import 'package:sement_market_customer/features/dealers/presentation/widgets/War
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Warehouses/warehouse_card_skeleton.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Warehouses/warehouses_search_bar.dart';
 import 'package:sement_market_customer/core/widgets/detail_page_header.dart';
-import 'package:sement_market_customer/core/widgets/detail_page_header.dart';
 
 class DealerWarehousesPage extends StatefulWidget {
   const DealerWarehousesPage({
@@ -92,8 +91,7 @@ class _DealerWarehousesPageState extends State<DealerWarehousesPage> {
                   }
                   if (state.warehouses.isEmpty) {
                     return DealersEmptyState(
-                      emptyTitle:
-                          AppLocalizations.of(context)!.warehousesEmpty,
+                      emptyTitle: AppLocalizations.of(context)!.warehousesEmpty,
                       emptyHint:
                           AppLocalizations.of(context)!.warehousesEmptyHint,
                       onRetry: () => context
@@ -139,15 +137,15 @@ class _DealerWarehousesPageState extends State<DealerWarehousesPage> {
                                 )
                               : const SizedBox.shrink();
                         }
-                    final warehouse = state.warehouses[index];
-                    return WarehouseCard(
-                      key: ValueKey(warehouse.id),
-                      warehouse: warehouse,
-                      onTap: () => context.push(
-                        '/diller/${widget.dealer.id}/w/${warehouse.id}',
-                        extra: warehouse,
-                      ),
-                    );
+                        final warehouse = state.warehouses[index];
+                        return WarehouseCard(
+                          key: ValueKey(warehouse.id),
+                          warehouse: warehouse,
+                          onTap: () => context.push(
+                            '/diller/${widget.dealer.id}/w/${warehouse.id}',
+                            extra: warehouse,
+                          ),
+                        );
                       },
                     ),
                   );

@@ -52,36 +52,88 @@ class ProductDetailsModal extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.all(24),
               children: [
-                // Product Image
-                AspectRatio(
-                  aspectRatio: 1,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(24),
+                // Product Images Carousel
+                if (product.images.isNotEmpty)
+                  SizedBox(
+                    height: 300,
+                    child: Stack(
+                      children: [
+                        PageView.builder(
+                          itemCount: product.images.length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.background,
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(24),
+                                child: Image.network(
+                                  product.images[index],
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        if (product.images.length > 1)
+                          Positioned(
+                            bottom: 12,
+                            left: 0,
+                            right: 0,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(
+                                product.images.length,
+                                (index) => Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.darkNavy.withOpacity(0.5),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(24),
-                      child: product.firstImage != null
-                          ? Image.network(
-                              product.firstImage!,
-                              fit: BoxFit.cover,
-                            )
-                          : const Icon(Icons.image_outlined,
-                              size: 64, color: Colors.grey),
+                  )
+                else
+                  AspectRatio(
+                    aspectRatio: 1,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: const Icon(Icons.image_outlined,
+                          size: 64, color: Colors.grey),
                     ),
                   ),
-                ),
                 const SizedBox(height: 24),
-                // Brand
-                Text(
-                  product.brandName?.toUpperCase() ?? '',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.gold,
-                    letterSpacing: 1,
-                  ),
+                // Brand & IDs
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      product.brandName?.toUpperCase() ?? 'BRENDSIZ',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.gold,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    Text(
+                      'ID: #${product.id}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.grayText,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 // Name
@@ -94,30 +146,54 @@ class ProductDetailsModal extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Price
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                // Price & Earnings
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      _formatPrice(product.price),
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.darkNavy,
-                      ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          _formatPrice(product.price),
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.darkNavy,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text(
+                            'SUM / ${product.unitName ?? 'qop'}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.grayText,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
-                      child: Text(
-                        'SUM / ${product.unitName ?? 'qop'}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.grayText,
+                    if (product.earningsPerUnit != null && product.earningsPerUnit != '0')
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.green[50],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'Daromad: ${_formatPrice(product.earningsPerUnit!)} sum/${product.unitName ?? 'qop'}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.green[800],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -198,5 +274,34 @@ class ProductDetailsModal extends StatelessWidget {
     } catch (_) {
       return price;
     }
+  }
+
+  Widget _infoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: AppColors.darkNavy.withOpacity(0.6)),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              color: AppColors.grayText,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const Spacer(),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              color: AppColors.darkNavy,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

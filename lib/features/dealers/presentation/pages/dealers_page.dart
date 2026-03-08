@@ -12,7 +12,6 @@ import 'package:sement_market_customer/features/dealers/presentation/widgets/Dea
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Dealers/dealers_error_state.dart';
 import 'package:sement_market_customer/features/dealers/presentation/widgets/Dealers/dealers_filter_modal.dart';
 import 'package:sement_market_customer/core/utils/location_helper.dart';
-import 'package:sement_market_customer/core/utils/location_helper.dart';
 
 class DealersPage extends StatefulWidget {
   const DealersPage({super.key});
@@ -227,8 +226,7 @@ class _DealersPageState extends State<DealersPage> {
                             (state.hasMore ? 60 : 0) +
                             MediaQuery.of(context).padding.bottom,
                       ),
-                      itemCount:
-                          state.dealers.length + (state.hasMore ? 1 : 0),
+                      itemCount: state.dealers.length + (state.hasMore ? 1 : 0),
                       itemBuilder: (context, index) {
                         if (index >= state.dealers.length) {
                           WidgetsBinding.instance.addPostFrameCallback((_) {
