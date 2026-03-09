@@ -6,6 +6,8 @@ class CartState extends Equatable {
     this.warehouseData = const {},
     this.isLoading = false,
     this.error,
+    this.orderPlacingForWarehouse,
+    this.orderError,
   });
 
   /// Lightweight entries stored locally (product_id, warehouse_id, quantity).
@@ -16,6 +18,10 @@ class CartState extends Equatable {
 
   final bool isLoading;
   final String? error;
+
+  /// Non-null when an order is being placed for a specific warehouse.
+  final int? orderPlacingForWarehouse;
+  final String? orderError;
 
   /// Total item count across all warehouses (for badge).
   int get totalItemCount => entries.length;
@@ -31,15 +37,29 @@ class CartState extends Equatable {
     Map<int, CartWarehouseData>? warehouseData,
     bool? isLoading,
     String? error,
+    int? orderPlacingForWarehouse,
+    String? orderError,
+    bool clearOrderState = false,
   }) {
     return CartState(
       entries: entries ?? this.entries,
       warehouseData: warehouseData ?? this.warehouseData,
       isLoading: isLoading ?? this.isLoading,
       error: error,
+      orderPlacingForWarehouse: clearOrderState
+          ? null
+          : (orderPlacingForWarehouse ?? this.orderPlacingForWarehouse),
+      orderError: clearOrderState ? null : (orderError ?? this.orderError),
     );
   }
 
   @override
-  List<Object?> get props => [entries, warehouseData, isLoading, error];
+  List<Object?> get props => [
+        entries,
+        warehouseData,
+        isLoading,
+        error,
+        orderPlacingForWarehouse,
+        orderError
+      ];
 }

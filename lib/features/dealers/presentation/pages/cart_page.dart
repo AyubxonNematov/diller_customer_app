@@ -78,7 +78,29 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CartBloc, CartState>(
+    return BlocConsumer<CartBloc, CartState>(
+      listenWhen: (prev, curr) =>
+          prev.orderPlacingForWarehouse != curr.orderPlacingForWarehouse ||
+          prev.orderError != curr.orderError,
+      listener: (context, state) {
+        if (state.orderError != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Xatolik: ${state.orderError}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        } else if (state.orderPlacingForWarehouse == null &&
+            state.entries.isNotEmpty) {
+          // order just completed — warehouse was cleared
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Buyurtma muvaffaqiyatli berildi! ✅'),
+              backgroundColor: Color(0xFF2E7D32),
+            ),
+          );
+        }
+      },
       builder: (context, state) {
         // Empty cart
         if (state.entries.isEmpty) {
@@ -173,8 +195,16 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                 totalAmount: activeData.totalPrice,
                 totalEarnings: activeData.totalEarnings,
                 isDelivery: _isDelivery,
+                isPlacingOrder:
+                    state.orderPlacingForWarehouse == activeWarehouseId,
                 onDeliveryTypeChanged: (val) =>
                     setState(() => _isDelivery = val),
+                onOrderTap: () {
+                  context.read<CartBloc>().add(PlaceOrder(
+                        warehouseId: activeWarehouseId,
+                        deliveryType: _isDelivery ? 'delivery' : 'pickup',
+                      ));
+                },
                 onBiddingTap: () {
                   Navigator.push(
                     context,

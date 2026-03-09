@@ -9,6 +9,8 @@ class CartBottomSummary extends StatelessWidget {
     required this.isDelivery,
     required this.onDeliveryTypeChanged,
     this.onBiddingTap,
+    this.onOrderTap,
+    this.isPlacingOrder = false,
   });
 
   final double totalAmount;
@@ -16,6 +18,8 @@ class CartBottomSummary extends StatelessWidget {
   final bool isDelivery;
   final ValueChanged<bool> onDeliveryTypeChanged;
   final VoidCallback? onBiddingTap;
+  final VoidCallback? onOrderTap;
+  final bool isPlacingOrder;
 
   @override
   Widget build(BuildContext context) {
@@ -114,13 +118,15 @@ class CartBottomSummary extends StatelessWidget {
               width: double.infinity,
               height: 60,
               child: FilledButton(
-                onPressed: () {
-                  if (isDelivery) {
-                    onBiddingTap?.call();
-                  } else {
-                    // Place order logic
-                  }
-                },
+                onPressed: isPlacingOrder
+                    ? null
+                    : () {
+                        if (isDelivery) {
+                          onBiddingTap?.call();
+                        } else {
+                          onOrderTap?.call();
+                        }
+                      },
                 style: FilledButton.styleFrom(
                   backgroundColor: const Color(0xFFF5BF1A),
                   foregroundColor: AppColors.darkNavy,
@@ -128,11 +134,20 @@ class CartBottomSummary extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
-                child: Text(
-                  isDelivery ? 'HAYDOVCHI QIDIRISH' : 'BUYURTMA BERISH',
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w900),
-                ),
+                child: isPlacingOrder
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: AppColors.darkNavy,
+                        ),
+                      )
+                    : Text(
+                        isDelivery ? 'HAYDOVCHI QIDIRISH' : 'BUYURTMA BERISH',
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w900),
+                      ),
               ),
             ),
           ],

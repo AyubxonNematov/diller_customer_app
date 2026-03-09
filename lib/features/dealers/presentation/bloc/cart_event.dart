@@ -54,3 +54,12 @@ class ClearCart extends CartEvent {
   @override
   List<Object?> get props => [warehouseId];
 }
+
+class PlaceOrder extends CartEvent {
+  final int warehouseId;
+  final String deliveryType; // 'pickup', 'delivery', 'free_delivery'
+  const PlaceOrder({required this.warehouseId, required this.deliveryType});
+
+  @override
+  List<Object?> get props => [warehouseId, deliveryType];
+}

@@ -9,6 +9,7 @@ import 'package:sement_market_customer/features/dealers/data/models/cart_item_mo
 import 'package:sement_market_customer/features/dealers/data/models/cart_warehouse_data.dart';
 import 'package:sement_market_customer/features/dealers/data/models/product_model.dart';
 import 'package:sement_market_customer/features/dealers/data/models/warehouse_model.dart';
+import 'package:sement_market_customer/features/orders/data/orders_api.dart';
 
 part 'cart_event.dart';
 part 'cart_state.dart';
@@ -23,11 +24,13 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<UpdateCartItemQuantity>(_onUpdateQuantity);
     on<RemoveFromCart>(_onRemoveFromCart);
     on<ClearCart>(_onClearCart);
+    on<PlaceOrder>(_onPlaceOrder);
 
     add(CartItemsLoaded());
   }
 
   final DealersApi _dealersApi = getIt<DealersApi>();
+  final OrdersApi _ordersApi = getIt<OrdersApi>();
 
   Future<void> _onItemsLoaded(
       CartItemsLoaded event, Emitter<CartState> emit) async {
@@ -229,6 +232,42 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
     emit(state.copyWith(entries: entries, warehouseData: warehouseData));
     await _saveToStorage(entries);
+  }
+
+  Future<void> _onPlaceOrder(PlaceOrder event, Emitter<CartState> emit) async {
+    emit(state.copyWith(
+      orderPlacingForWarehouse: event.warehouseId,
+      clearOrderState: false,
+    ));
+
+    try {
+      // Build items array from cart entries for this warehouse
+      final warehouseEntries = state.entries
+          .where((e) => e.warehouseId == event.warehouseId)
+          .toList();
+
+      final items = warehouseEntries
+          .map((e) => {
+                'product_id': e.productId,
+                'quantity': e.quantity,
+              })
+          .toList();
+
+      await _ordersApi.createOrder(
+        warehouseId: event.warehouseId,
+        deliveryType: event.deliveryType,
+        items: items,
+      );
+
+      // Clear this warehouse's items from cart on success
+      add(ClearCart(warehouseId: event.warehouseId));
+      emit(state.copyWith(clearOrderState: true));
+    } catch (e) {
+      emit(state.copyWith(
+        orderPlacingForWarehouse: null,
+        orderError: e.toString(),
+      ));
+    }
   }
 
   Future<void> _saveToStorage(List<CartEntry> entries) async {

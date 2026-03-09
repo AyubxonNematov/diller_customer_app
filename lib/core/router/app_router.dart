@@ -19,6 +19,10 @@ import 'package:sement_market_customer/features/dealers/presentation/pages/cart_
 import 'package:sement_market_customer/features/dealers/presentation/bloc/cart_bloc.dart';
 import 'package:sement_market_customer/features/auth/presentation/pages/login_page.dart';
 import 'package:sement_market_customer/features/notifications/presentation/pages/notifications_page.dart';
+import 'package:sement_market_customer/features/orders/data/models/order_model.dart';
+import 'package:sement_market_customer/features/orders/presentation/bloc/orders_bloc.dart';
+import 'package:sement_market_customer/features/orders/presentation/pages/orders_page.dart';
+import 'package:sement_market_customer/features/orders/presentation/pages/order_detail_page.dart';
 import 'package:sement_market_customer/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:sement_market_customer/features/profile/presentation/pages/profile_page.dart';
 
@@ -98,8 +102,21 @@ abstract class AppRouter {
             routes: [
               GoRoute(
                 path: '/zakazlar',
-                builder: (c, __) => _PlaceholderPage(
-                  title: AppLocalizations.of(c)!.zakazlar,
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    builder: (context, state) {
+                      final order = state.extra as OrderModel?;
+                      if (order == null) {
+                        return const SizedBox.shrink();
+                      }
+                      return OrderDetailPage(order: order);
+                    },
+                  ),
+                ],
+                builder: (c, __) => BlocProvider(
+                  create: (_) => OrdersBloc(),
+                  child: const OrdersPage(),
                 ),
               ),
             ],
@@ -219,25 +236,6 @@ class _MainShell extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _PlaceholderPage extends StatelessWidget {
-  const _PlaceholderPage({required this.title});
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      body: Center(
-        child: Text(title,
-            style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-                color: AppColors.darkNavy)),
       ),
     );
   }
