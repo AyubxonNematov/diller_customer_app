@@ -240,9 +240,9 @@ class _QuantitySelectionBottomSheetState
       spacing: 8,
       runSpacing: 8,
       children: [
-        _quickButton('-500', -500, isNeg: true),
-        _quickButton('-50', -50, isNeg: true),
         _quickButton('-5', -5, isNeg: true),
+        _quickButton('-50', -50, isNeg: true),
+        _quickButton('-500', -500, isNeg: true),
         _quickButton('+5', 5),
         _quickButton('+50', 50),
         _quickButton('+500', 500),

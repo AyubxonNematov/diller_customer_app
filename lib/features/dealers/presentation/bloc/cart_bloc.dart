@@ -156,12 +156,12 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         currentEntries.indexWhere((e) => e.productId == event.productId);
 
     if (index != -1) {
-      if (event.quantity <= 0) {
-        currentEntries.removeAt(index);
-      } else {
-        currentEntries[index] =
-            currentEntries[index].copyWith(quantity: event.quantity);
-      }
+      // Minimum quantity is 1 — item is never auto-removed
+      final clampedQuantity = event.quantity < 1 ? 1 : event.quantity;
+
+      currentEntries[index] =
+          currentEntries[index].copyWith(quantity: clampedQuantity);
+
       emit(state.copyWith(entries: currentEntries));
       await _saveToStorage(currentEntries);
 
@@ -170,32 +170,16 @@ class CartBloc extends Bloc<CartEvent, CartState> {
           Map<int, CartWarehouseData>.from(state.warehouseData);
       for (final warehouseId in updatedWarehouseData.keys) {
         final data = updatedWarehouseData[warehouseId]!;
-        if (event.quantity <= 0) {
-          // Remove item from warehouse data
-          final updatedItems = data.items
-              .where((item) => item.product.id != event.productId)
-              .toList();
-          if (updatedItems.isEmpty) {
-            updatedWarehouseData.remove(warehouseId);
-          } else {
-            updatedWarehouseData[warehouseId] = CartWarehouseData(
-              warehouse: data.warehouse,
-              items: updatedItems,
-            );
+        final updatedItems = data.items.map((item) {
+          if (item.product.id == event.productId) {
+            return item.copyWith(quantity: clampedQuantity);
           }
-        } else {
-          // Update quantity in warehouse data
-          final updatedItems = data.items.map((item) {
-            if (item.product.id == event.productId) {
-              return item.copyWith(quantity: event.quantity);
-            }
-            return item;
-          }).toList();
-          updatedWarehouseData[warehouseId] = CartWarehouseData(
-            warehouse: data.warehouse,
-            items: updatedItems,
-          );
-        }
+          return item;
+        }).toList();
+        updatedWarehouseData[warehouseId] = CartWarehouseData(
+          warehouse: data.warehouse,
+          items: updatedItems,
+        );
       }
       emit(state.copyWith(warehouseData: updatedWarehouseData));
     }

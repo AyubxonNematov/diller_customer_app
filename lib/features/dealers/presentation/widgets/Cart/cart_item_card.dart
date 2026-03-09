@@ -85,13 +85,13 @@ class CartItemCard extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              _quickAdjustItemButton(context, -500),
-              const SizedBox(width: 8),
               _quickAdjustItemButton(context, -50),
               const SizedBox(width: 8),
-              _quickAdjustItemButton(context, 50),
+              _quickAdjustItemButton(context, -5),
               const SizedBox(width: 8),
-              _quickAdjustItemButton(context, 500),
+              _quickAdjustItemButton(context, 5),
+              const SizedBox(width: 8),
+              _quickAdjustItemButton(context, 50),
             ],
           ),
         ],
@@ -110,10 +110,15 @@ class CartItemCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            onPressed: () => context.read<CartBloc>().add(
-                UpdateCartItemQuantity(
-                    productId: item.product.id, quantity: item.quantity - 1)),
-            icon: const Icon(Icons.remove, size: 18, color: Color(0xFF1E2D3D)),
+            onPressed: item.quantity > 1
+                ? () => context.read<CartBloc>().add(UpdateCartItemQuantity(
+                    productId: item.product.id, quantity: item.quantity - 1))
+                : null,
+            icon: Icon(Icons.remove,
+                size: 18,
+                color: item.quantity > 1
+                    ? const Color(0xFF1E2D3D)
+                    : Colors.grey[400]),
           ),
           Text(
             item.quantity.toString(),
@@ -135,17 +140,26 @@ class CartItemCard extends StatelessWidget {
 
   Widget _quickAdjustItemButton(BuildContext context, int delta) {
     final bool isNeg = delta < 0;
+    // Clamp so quantity never goes below 1
+    final int newQuantity = (item.quantity + delta).clamp(1, 999999);
+    final bool isDisabled = isNeg && item.quantity <= 1;
     return Expanded(
       child: InkWell(
-        onTap: () => context.read<CartBloc>().add(UpdateCartItemQuantity(
-            productId: item.product.id, quantity: item.quantity + delta)),
+        onTap: isDisabled
+            ? null
+            : () => context.read<CartBloc>().add(UpdateCartItemQuantity(
+                productId: item.product.id, quantity: newQuantity)),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: isNeg ? Colors.red[50] : Colors.green[50],
+            color: isDisabled
+                ? Colors.grey[100]
+                : (isNeg ? Colors.red[50] : Colors.green[50]),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-                color: isNeg ? Colors.red[100]! : Colors.green[100]!),
+                color: isDisabled
+                    ? Colors.grey[300]!
+                    : (isNeg ? Colors.red[100]! : Colors.green[100]!)),
           ),
           child: Text(
             (delta > 0 ? '+$delta' : '$delta'),
@@ -153,7 +167,9 @@ class CartItemCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w800,
-              color: isNeg ? Colors.red[700] : Colors.green[700],
+              color: isDisabled
+                  ? Colors.grey[400]
+                  : (isNeg ? Colors.red[700] : Colors.green[700]),
             ),
           ),
         ),
